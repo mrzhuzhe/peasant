@@ -16,7 +16,7 @@
 #include	<time.h>		/* timespec{} for pselect() */
 #include	<netinet/in.h>	/* sockaddr_in{} and other Internet defns */
 #include	<arpa/inet.h>	/* inet(3) functions */
-#include	<netinet/sctp.h> /* note if sctp does not exist we blow up :> */
+// #include	<netinet/sctp.h> /* note if sctp does not exist we blow up :> */
 #include	<errno.h>
 #include	<fcntl.h>		/* for nonblocking */
 #include	<netdb.h>
@@ -282,8 +282,8 @@ void sctp_check_notification(int sock_fd,char *recvlin);
 int sctp_heartbeat_action(int sock_fd, struct sockaddr *sa, 
 			  int action, u_int value);
 
-sctp_assoc_t
-sctp_address_to_associd(int sock_fd, struct sockaddr *sa, socklen_t);
+// sctp_assoc_t
+// sctp_address_to_associd(int sock_fd, struct sockaddr *sa, socklen_t);
 
 
 void
