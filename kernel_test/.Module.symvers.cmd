@@ -1,1 +1,0 @@
-savedcmd_/mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/peasant/kernel_test/Module.symvers :=  scripts/mod/modpost -m -a      -o /mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/peasant/kernel_test/Module.symvers -T /mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/peasant/kernel_test/modules.order -i Module.symvers -e 
