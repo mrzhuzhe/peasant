@@ -1,0 +1,1 @@
+savedcmd_/mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/peasant/kernel_test/test_simple.mod := printf '%s\n'   test_simple.o | awk '!x[$$0]++ { print("/mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/peasant/kernel_test/"$$0) }' > /mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/peasant/kernel_test/test_simple.mod
