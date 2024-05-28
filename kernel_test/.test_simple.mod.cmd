@@ -1,0 +1,1 @@
+savedcmd_/home/sanszhu/Documents/codes/peasant/kernel_test/test_simple.mod := printf '%s\n'   test_simple.o | awk '!x[$$0]++ { print("/home/sanszhu/Documents/codes/peasant/kernel_test/"$$0) }' > /home/sanszhu/Documents/codes/peasant/kernel_test/test_simple.mod

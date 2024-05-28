@@ -1,0 +1,1 @@
+savedcmd_/home/sanszhu/Documents/codes/peasant/kernel_test/modules.order := {   echo /home/sanszhu/Documents/codes/peasant/kernel_test/test_simple.o; :; } > /home/sanszhu/Documents/codes/peasant/kernel_test/modules.order
