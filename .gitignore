@@ -43,3 +43,8 @@ unp_test/getConfgHeader/config.h
 
 *.ko
 *.o
+*.mod
+*.symvers
+*.order
+*.cmd
+*.mod.c
