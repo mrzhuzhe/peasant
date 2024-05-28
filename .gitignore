@@ -40,3 +40,6 @@ unp_test/getConfgHeader/config.status
 unp_test/getConfgHeader/Make.defines
 unp_test/getConfgHeader/Makefile
 unp_test/getConfgHeader/config.h
+
+*.ko
+*.o
