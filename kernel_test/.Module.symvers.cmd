@@ -1,0 +1,1 @@
+savedcmd_/home/sanszhu/Documents/codes/peasant/kernel_test/Module.symvers :=  scripts/mod/modpost -m -a      -o /home/sanszhu/Documents/codes/peasant/kernel_test/Module.symvers -T /home/sanszhu/Documents/codes/peasant/kernel_test/modules.order -i Module.symvers -e 
