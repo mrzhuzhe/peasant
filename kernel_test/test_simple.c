@@ -1,4 +1,5 @@
 /*
+https://tldp.org/LDP/lkmpg/2.6/html/x427.html
 /var/log/kern.log
 
 insmod test_simple.ko
