@@ -1,4 +1,5 @@
 obj-m += test_simple.o
+obj-m += chardev.o
 
 kver=6.5.0-28-generic
 
