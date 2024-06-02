@@ -1,5 +1,7 @@
 obj-m += test_simple.o
 obj-m += chardev.o
+obj-m += procfs.o
+
 
 kver=6.5.0-28-generic
 
