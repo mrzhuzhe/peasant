@@ -54,9 +54,8 @@ a better version
 
 struct proc_dir_entry *Our_Proc_File; 
 
-int procfile_read(char *buffer, char **buffer_location, off_t offset, int buffer_length, int *eof, void *data)
+ssize_t procfile_read(struct file *file_pointer, char __user *buffer, size_t buffer_length, loff_t *offset)
 {
-	int ret;
 	printk(KERN_INFO "procfile_read (/proc/%s) called\n", procfs_name);
 	/* 
 	 * We give all of our information in one go, so if the
@@ -69,10 +68,16 @@ int procfile_read(char *buffer, char **buffer_location, off_t offset, int buffer
 	 * that it has no more information, or until its
 	 * buffer is filled.
 	 */
-	if (offset > 0){
+	char s[] = "Hello mfs\n";
+	int len = sizeof(s);
+	ssize_t ret = len;
+	
+	if (*offset >= len || copy_to_user(buffer, s, len)){
+		pr_info("copy to  user failed\n");
 		ret=0;
 	} else {
-		ret = sprintf(buffer, "Hello asshole \n");
+		pr_info("procfile read %s\n", file_pointer->f_path.dentry->d_name.name);
+		*offset += len;
 	}
 	return ret;
 }
