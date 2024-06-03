@@ -6,10 +6,14 @@ a better version
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/proc_fs.h>
-#include <fs/proc/internal.h>
+#include <linux/uaccess.h>
+#include <linux/version.h>
+
 #define procfs_name "hellofatass"
 
-struct proc_dir_entry *Our_Proc_File;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
+#define HAVE_PROC_OPS
+#endif
 
 /* Put data into the proc fs file.
  * 
@@ -48,6 +52,8 @@ struct proc_dir_entry *Our_Proc_File;
  * free - use it.
  */
 
+struct proc_dir_entry *Our_Proc_File; 
+
 int procfile_read(char *buffer, char **buffer_location, off_t offset, int buffer_length, int *eof, void *data)
 {
 	int ret;
@@ -71,20 +77,25 @@ int procfile_read(char *buffer, char **buffer_location, off_t offset, int buffer
 	return ret;
 }
 
+#ifdef HAVE_PROC_OPS
+const struct proc_ops proc_file_fops = {
+	.proc_read = procfile_read,
+};
+#else 
+const struct file_operations proc_file_fops = {
+	.read = procfile_read,
+};
+#endif
+
+
 int init_module()
 {
-	Our_Proc_File = create_proc_entry(procfs_name, 0644, NULL);
+	Our_Proc_File = proc_create(procfs_name, 0644, NULL, &proc_file_fops);
 	if (Our_Proc_File == NULL){
-		remove_proc_entry(procfs_name, &proc_root);
+		proc_remove(Our_Proc_File);
 		printk(KERN_ALERT, "Error: Could not initialize /proc/%s\n", procfs_name);
 		return -ENOMEM;
 	}	
-	Our_Proc_File->read_proc = procfile_read;
-	Our_Proc_File->owner = THIS_MODULE;
-	Our_Proc_File->mode = S_IFREG | S_IRUGO;
-	Our_Proc_File->uid = 0;
-	Our_Proc_File->gid = 0;
-	Our_Proc_File->size = 37;
 	printk(KERN_INFO "/proc/%s created\n", procfs_name);
 	return 0;
 }	
@@ -92,32 +103,13 @@ int init_module()
 
 void cleanup_module()
 {
-	remove_proc_entry(procfs_name, &proc_root);
-	printk(KERN_INFO "/proc/%s removed\n", procfs_name);
+	proc_remove(Our_Proc_File);
+	pr_info(KERN_INFO "/proc/%s removed\n", procfs_name);
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+MODULE_LICENSE("GPL");
 
 
 
