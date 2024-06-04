@@ -1,6 +1,10 @@
 /*
 https://sysprog21.github.io/lkmpg/#the-proc-file-system 
 a better version
+
+a vim problem
+https://stackoverflow.com/questions/37644682/why-is-vim-so-slow
+
 */
 
 #include <linux/module.h>
