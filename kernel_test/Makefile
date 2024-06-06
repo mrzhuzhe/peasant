@@ -3,6 +3,7 @@ obj-m += chardev.o
 obj-m += procfs.o
 obj-m += seq_fs.o
 obj-m += sys-vars.o
+obj-m += test_ioctl.o
 
 kver=6.5.0-28-generic
 
