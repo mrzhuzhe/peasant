@@ -3,4 +3,7 @@
 
 ## linux kernel 
 
+1. 内存碎片华 freelist + buddy算法 + 扁平化堆容器
+
+
 ## network protocol
