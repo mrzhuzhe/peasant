@@ -1,6 +1,7 @@
+# OS
 
-
-1. setup cross complier
+# Bug
+1. gcc cross complier cannot find mpc
 
 
 ## reffer
