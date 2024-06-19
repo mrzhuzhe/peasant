@@ -1,8 +1,12 @@
 # OS
 
-# Bug
+## Bug
 1. gcc cross complier cannot find mpc
 
 
 ## reffer
 1. https://wiki.osdev.org/Bare_Bones
+
+## dependence
+
+1. xorriso mtools grub
