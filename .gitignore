@@ -48,3 +48,7 @@ unp_test/getConfgHeader/config.h
 *.order
 *.cmd
 *.mod.c
+*.bin
+*.iso
+
+boot_test/isodir
