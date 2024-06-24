@@ -50,5 +50,9 @@ unp_test/getConfgHeader/config.h
 *.mod.c
 *.bin
 *.iso
+*.a
+*.d
 
-boot_test/isodir
+*.iso
+isodir
+sysroot
