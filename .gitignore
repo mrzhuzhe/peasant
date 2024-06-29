@@ -56,4 +56,4 @@ unp_test/getConfgHeader/config.h
 *.iso
 isodir
 sysroot
-*,kernel
+*.kernel
