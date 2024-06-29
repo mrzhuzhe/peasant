@@ -8,5 +8,6 @@
 https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf 
 https://wiki.osdev.org/Main_Page
 https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http://www.jamesmolloy.co.uk/tutorial_html/index.html
+3. real mode protected mode
 
 ## network protocol
