@@ -9,6 +9,7 @@ https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
 https://wiki.osdev.org/Main_Page
 https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http://www.jamesmolloy.co.uk/tutorial_html/index.html
 3. Master Boot Record (MBR) real mode protected mode
-5. STM32F103C8T6 https://github.com/CShark/stm32usb https://stackoverflow.com/questions/73551956/stm32-bare-metal-usb-implementation
+4. STM32F103C8T6 https://github.com/CShark/stm32usb https://stackoverflow.com/questions/73551956/stm32-bare-metal-usb-implementation
+5. rtos https://github.com/ve3wwg/stm32f103c8t6
 
 ## network protocol
