@@ -11,6 +11,20 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
 3. Master Boot Record (MBR) real mode protected mode
 4. STM32F103C8T6 https://github.com/CShark/stm32usb https://stackoverflow.com/questions/73551956/stm32-bare-metal-usb-implementation
 5. rtos https://github.com/ve3wwg/stm32f103c8t6
+6. More topics
+    
+    Cook: Security things in Linux v5.3
+
+    Unexporting the system call table
+
+    Controll-flow integrity for the kernel
+
+    Unexporting kallsyms_lookup_name
+
+    Kernel Proble
+
+    Kernel address space layout randomization
+
 
 ## network protocol
 1. 流量工程 https://github.com/Kong/kong
