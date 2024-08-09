@@ -4,6 +4,7 @@
 ## linux kernel 
 
 1. 内存碎片 freelist + buddy算法 + 扁平化堆容器
+    有新增有删除，就会产生背包问题，仅仅合并空的内存段也不能很好的解决此问题
 2. An OS how to https://github.com/cfenollosa/os-tutorial  
 https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf 
 https://wiki.osdev.org/Main_Page
@@ -24,7 +25,8 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
     Kernel Proble
 
     Kernel address space layout randomization
-
+7. task schedule / interupt handler https://sysprog21.github.io/lkmpg/
+8. gstack gdb strace 
 
 ## network protocol
 1. 流量工程 https://github.com/Kong/kong
