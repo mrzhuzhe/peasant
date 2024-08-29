@@ -27,6 +27,10 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
     Kernel address space layout randomization
 7. task schedule / interupt handler https://sysprog21.github.io/lkmpg/
 8. gstack gdb strace 
-
+9. amd and nvidia opensource driver
+    https://wiki.gentoo.org/wiki/Linux_firmware
+    https://github.com/GPUOpen-Drivers/pal
+    https://github.com/NVIDIA/open-gpu-kernel-modules
+    
 ## network protocol
 1. 流量工程 https://github.com/Kong/kong
