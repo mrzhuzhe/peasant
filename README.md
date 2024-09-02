@@ -25,9 +25,10 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
     Kernel Proble
 
     Kernel address space layout randomization
-7. task schedule / interupt handler 
+7. task schedule / interupt handler task deny , task wait , task workqueue 
     https://sysprog21.github.io/lkmpg/
     https://github.com/d0u9/Linux-Device-Driver ldd3 code
+    
 8. gstack gdb strace 
 9. amd and nvidia opensource driver
     https://wiki.gentoo.org/wiki/Linux_firmware
