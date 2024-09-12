@@ -39,6 +39,7 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
 11. usb request block
     firmware hotplugin 
     network dma
+12. Clifford Cummings
 
 ## network protocol
 1. 流量工程 https://github.com/Kong/kong
