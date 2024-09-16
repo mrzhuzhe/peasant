@@ -57,3 +57,5 @@ unp_test/getConfgHeader/config.h
 isodir
 sysroot
 *.kernel
+
+stm32/ledtest/libs

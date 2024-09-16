@@ -1,5 +1,5 @@
-# Cross compile for libopencm3 
-
+# Cross compile for arm cortex-M3 used in stm32
+ 
 ## Target
 """
 export PREFIX_ARM32="$HOME/opt/cross-arm"
@@ -43,3 +43,18 @@ make install-gcc
 make install-target-libgcc
 
 """
+
+# Setup libopencm3.a
+
+## NewLib
+
+"""
+
+cd newlib-cygwin/
+mkdir ../newlib-arm32-aout
+cd ../newlib-arm32-aout
+../newlib-cygwin/configure --target=$TARGET_ARM32 --prefix="$PREFIX_ARM32"
+make
+make install
+
+“”“
