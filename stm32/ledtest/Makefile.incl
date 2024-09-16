@@ -5,7 +5,7 @@
 PREFIX		?= arm-none-eabi
 
 TOP_DIR 	:= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-OPENCM3_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/libopencm3)
+OPENCM3_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/libs/libopencm3)
 
 LIBNAME		= opencm3_stm32f1
 DEFS		+= -DSTM32F1
