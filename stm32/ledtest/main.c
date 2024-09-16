@@ -32,17 +32,28 @@ gpio_setup(void) {
 
 int
 main(void) {
-	int i;
-
+	int i = 0;
+    int j = 0;
+    int repeat = 3;
+    int delay = 5e5;
 	gpio_setup();
 
 	for (;;) {
-		gpio_clear(GPIOC,GPIO13);	/* LED on */
-		for (i = 0; i < 1500000; i++)	/* Wait a bit. */
-			__asm__("nop");
+        for (j=0; j<repeat;j++){
+            gpio_clear(GPIOC,GPIO13);	/* LED on */
+            for (i = 0; i < delay*3; i++)	/* Wait a bit. */
+                __asm__("nop");
 
+            gpio_set(GPIOC,GPIO13);		/* LED off */
+            for (i = 0; i < delay; i++)	/* Wait a bit. */
+                __asm__("nop");
+        }
+		
+        gpio_clear(GPIOC,GPIO13);	/* LED on */
+        for (i = 0; i < delay*30; i++)	/* Wait a bit. */
+            __asm__("nop");
 		gpio_set(GPIOC,GPIO13);		/* LED off */
-		for (i = 0; i < 500000; i++)	/* Wait a bit. */
+		for (i = 0; i < delay*10; i++)	/* Wait a bit. */
 			__asm__("nop");
 	}
 
