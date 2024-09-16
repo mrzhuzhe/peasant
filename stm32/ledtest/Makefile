@@ -11,6 +11,6 @@ SRCFILES	= miniblink.c
 
 all: elf bin
 
-include Makefile.incl
+include ./Makefile.incl
 
 # End
