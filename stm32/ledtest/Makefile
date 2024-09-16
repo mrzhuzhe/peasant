@@ -3,8 +3,7 @@
 ######################################################################
 
 BINARY		= miniblink
-SRCFILES	= miniblink.c
-
+SRCFILES	= main.c
 #test:
 #	@echo $(TOP_DIR)
 #	@echo '$(OPENCM3_DIR)'	
