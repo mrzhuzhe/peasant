@@ -42,5 +42,9 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
 12. Clifford Cummings
     hardware software cooperation
 
+13. 硅初始化
+    opensil https://github.com/openSIL/openSIL
+    AMD Utralscale https://www.amd.com/en/products/adaptive-socs-and-fpgas/soc/zynq-ultrascale-plus-mpsoc.html
+
 ## network protocol
 1. 流量工程 https://github.com/Kong/kong
