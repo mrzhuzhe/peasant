@@ -53,25 +53,29 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
 
 ### Detail
 
-    Firmware - boot - driver - char device 
-                             - protocal 
-                             - abi
-                    - file system 
-                    - memory management 
-                        - DMA
-                        - page table 
-                        - vitual address
-                    - workqueue
-                    - network interface
-                    - interrupt handle
-                    - Peripheral device
-                        - I2C
-                        - SPI 
-                        - UART
-                        - PCIE
-                        - Ananlog to digital
-                    - Timer Tree 
-                        - PWN
+    Firmware - OS    
+                - boot
+                    - magic number 
+                    - layout 
+                - driver - char device 
+                            - protocal 
+                            - abi
+                - file system 
+                - memory management 
+                    - DMA
+                    - page table 
+                    - vitual address
+                - workqueue
+                - network interface
+                - interrupt handle
+                - Peripheral device
+                    - I2C
+                    - SPI 
+                    - UART
+                    - PCIE
+                    - Ananlog to digital
+                - Timer Tree 
+                    - PWN
 
     FPGA - RTL - LUT 
                - switch
