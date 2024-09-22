@@ -58,11 +58,20 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
                              - abi
                     - file system 
                     - memory management 
+                        - DMA
                         - page table 
                         - vitual address
                     - workqueue
                     - network interface
                     - interrupt handle
+                    - Peripheral device
+                        - I2C
+                        - SPI 
+                        - UART
+                        - PCIE
+                        - Ananlog to digital
+                    - Timer Tree 
+                        - PWN
 
     FPGA - RTL - LUT 
                - switch
