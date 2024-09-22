@@ -46,6 +46,9 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
     opensil https://github.com/openSIL/openSIL
     AMD Utralscale https://www.amd.com/en/products/adaptive-socs-and-fpgas/soc/zynq-ultrascale-plus-mpsoc.html
 
+14. Neuromophic computing 
+    snn
+
 
 
 ### Detail
