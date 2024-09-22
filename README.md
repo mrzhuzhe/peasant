@@ -1,7 +1,7 @@
 # Peasant
 > 听好了乡巴佬，等我当上国王，我要制定新的税法
 
-## linux kernel 
+## Linux kernel 
 
 1. 内存碎片 freelist + buddy算法 + 扁平化堆容器
     有新增有删除，就会产生背包问题，仅仅合并空的内存段也不能很好的解决此问题
@@ -46,5 +46,29 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
     opensil https://github.com/openSIL/openSIL
     AMD Utralscale https://www.amd.com/en/products/adaptive-socs-and-fpgas/soc/zynq-ultrascale-plus-mpsoc.html
 
-## network protocol
+
+
+### Detail
+
+    Firmware - boot - driver - char device 
+                             - protocal 
+                             - abi
+                    - file system 
+                    - memory management 
+                        - page table 
+                        - vitual address
+                    - workqueue
+                    - network interface
+                    - interrupt handle
+
+    FPGA - RTL - LUT 
+               - switch
+
+    Fluid Simulate - discrete - geo
+                              - gradient
+                   - solver
+                   - boundary condition
+
+
+## Network protocol
 1. 流量工程 https://github.com/Kong/kong
