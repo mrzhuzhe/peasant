@@ -88,3 +88,8 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
 
 ## Network protocol
 1. 流量工程 https://github.com/Kong/kong
+
+
+## VHDL
+1. Static Timing Analysis for Nanometer Designs: A Practical Approach
+2. advanced digital design with the verilog hdl
