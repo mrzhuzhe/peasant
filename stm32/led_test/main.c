@@ -28,6 +28,9 @@ gpio_setup(void) {
 	/* Set GPIO8 (in GPIO port C) to 'output push-pull'. */
 	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,
 		      GPIO_CNF_OUTPUT_PUSHPULL,GPIO14);
+
+    gpio_set_mode(GPIOC,GPIO_MODE_INPUT,
+		      GPIO_CNF_INPUT_PULL_UPDOWN,GPIO15);
 }
 
 int
@@ -37,24 +40,33 @@ main(void) {
     int repeat = 3;
     int delay = 5e5;
 	gpio_setup();
+    
+    gpio_set(GPIOC,GPIO14);		/* LED off */
 
+    uint16_t isGPIO15On = 0;
 	for (;;) {
-        for (j=0; j<repeat;j++){
-            gpio_clear(GPIOC,GPIO14);	/* LED on */
-            for (i = 0; i < delay*3; i++)	/* Wait a bit. */
-                __asm__("nop");
 
-            gpio_set(GPIOC,GPIO14);		/* LED off */
-            for (i = 0; i < delay; i++)	/* Wait a bit. */
+        isGPIO15On = gpio_get(GPIOC,GPIO15);	
+        if (isGPIO15On != 0){
+            for (j=0; j<repeat;j++){
+                gpio_clear(GPIOC,GPIO14);	/* LED on */
+                for (i = 0; i < delay*3; i++)	/* Wait a bit. */
+                    __asm__("nop");
+
+                gpio_set(GPIOC,GPIO14);		/* LED off */
+                for (i = 0; i < delay; i++)	/* Wait a bit. */
+                    __asm__("nop");
+            }
+            
+            gpio_clear(GPIOC,GPIO14);	/* LED on */
+            for (i = 0; i < delay*30; i++)	/* Wait a bit. */
                 __asm__("nop");
+            gpio_set(GPIOC,GPIO14);		/* LED off */
+            for (i = 0; i < delay*10; i++)	/* Wait a bit. */
+            	__asm__("nop");
+            isGPIO15On = 0;
         }
-		
-        gpio_clear(GPIOC,GPIO14);	/* LED on */
-        for (i = 0; i < delay*30; i++)	/* Wait a bit. */
-            __asm__("nop");
-		gpio_set(GPIOC,GPIO14);		/* LED off */
-		for (i = 0; i < delay*10; i++)	/* Wait a bit. */
-			__asm__("nop");
+
 	}
 
 	return 0;
