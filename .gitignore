@@ -58,6 +58,6 @@ isodir
 sysroot
 *.kernel
 
-stm32/ledtest/libs
+stm32/**/libs
 *.elf
 *.map
