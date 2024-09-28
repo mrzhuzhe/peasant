@@ -27,7 +27,7 @@ gpio_setup(void) {
 
 	/* Set GPIO8 (in GPIO port C) to 'output push-pull'. */
 	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,
-		      GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
+		      GPIO_CNF_OUTPUT_PUSHPULL,GPIO14);
 }
 
 int
@@ -40,19 +40,19 @@ main(void) {
 
 	for (;;) {
         for (j=0; j<repeat;j++){
-            gpio_clear(GPIOC,GPIO13);	/* LED on */
+            gpio_clear(GPIOC,GPIO14);	/* LED on */
             for (i = 0; i < delay*3; i++)	/* Wait a bit. */
                 __asm__("nop");
 
-            gpio_set(GPIOC,GPIO13);		/* LED off */
+            gpio_set(GPIOC,GPIO14);		/* LED off */
             for (i = 0; i < delay; i++)	/* Wait a bit. */
                 __asm__("nop");
         }
 		
-        gpio_clear(GPIOC,GPIO13);	/* LED on */
+        gpio_clear(GPIOC,GPIO14);	/* LED on */
         for (i = 0; i < delay*30; i++)	/* Wait a bit. */
             __asm__("nop");
-		gpio_set(GPIOC,GPIO13);		/* LED off */
+		gpio_set(GPIOC,GPIO14);		/* LED off */
 		for (i = 0; i < delay*10; i++)	/* Wait a bit. */
 			__asm__("nop");
 	}
