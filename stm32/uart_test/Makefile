@@ -2,7 +2,7 @@
 #  Project
 ######################################################################
 
-BINARY		= miniblink
+BINARY		= uart
 SRCFILES	= main.c
 #test:
 #	@echo $(TOP_DIR)
