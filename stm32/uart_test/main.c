@@ -1,61 +1,112 @@
-/*
- * This file is part of the libopencm3 project.
- *
- * Copyright (C) 2009 Uwe Hermann <uwe@hermann-uwe.de>
- *
- * This library is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library.  If not, see <http://www.gnu.org/licenses/>.
+/* uart.cpp -- UART1 Demo using libopencm3, no flow control
+ * Date: Sat Feb 11 15:38:36 2017  (C) Warren W. Gay VE3WWG 
  */
+#include "miniprintf.h"
+
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/usart.h>
+
+static int uart_printf(const char *format,...) __attribute((format(printf,1,2)));
 
 static void
-gpio_setup(void) {
+init_clock(void) {
 
-	/* Enable GPIOC clock. */
+	rcc_clock_setup_in_hse_8mhz_out_24mhz();
 	rcc_periph_clock_enable(RCC_GPIOC);
 
-	/* Set GPIO8 (in GPIO port C) to 'output push-pull'. */
-	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,
-		      GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
+	// Clock for GPIO port A: GPIO_USART1_TX, USART1
+	rcc_periph_clock_enable(RCC_GPIOA);
+	rcc_periph_clock_enable(RCC_USART1);
+}
+
+static void
+init_usart(void) {
+
+	//////////////////////////////////////////////////////////////
+	// STM32F103C8T6:
+	//	RX:	A9
+	//	TX:	A10
+	//	CTS:	A11 (not used)
+	//	RTS:	A12 (not used)
+	//	Baud:	38400
+	//////////////////////////////////////////////////////////////
+
+	// GPIO_USART1_TX/GPIO13 on GPIO port A for tx
+	gpio_set_mode(GPIOA,GPIO_MODE_OUTPUT_50_MHZ,GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,GPIO_USART1_TX);
+
+	usart_set_baudrate(USART1,38400);
+	usart_set_databits(USART1,8);
+	usart_set_stopbits(USART1,USART_STOPBITS_1);
+	usart_set_mode(USART1,USART_MODE_TX);
+	usart_set_parity(USART1,USART_PARITY_NONE);
+	usart_set_flow_control(USART1,USART_FLOWCONTROL_NONE);
+	usart_enable(USART1);
+}
+
+static void
+init_gpio(void) {
+	// C.GPIO13:
+	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
+}
+
+static inline void
+uart_putc(char ch) {
+	usart_send_blocking(USART1,ch);
+}
+
+static int
+uart_printf(const char *format,...) {
+	va_list args;
+	int rc;
+
+	va_start(args,format);
+	rc = mini_vprintf_cooked(uart_putc,format,args);
+	va_end(args);
+	return rc;
+}
+
+static void
+pause(void) {
+	int x;
+
+	for ( x = 0; x < 800000; x++ )	// Wait
+		__asm__("NOP");
 }
 
 int
 main(void) {
-	int i = 0;
-    int j = 0;
-    int repeat = 3;
-    int delay = 5e5;
-	gpio_setup();
+	int y = 0, x = 0;
+	int count = -5;
+
+	init_clock();
+	init_gpio();
+	init_usart();
+
+	int c = uart_printf("\nuart.c demo using mini_printf():\n");
+	uart_printf("Count = %d\n",c);
+
+	{
+		char temp[256];
+		int c2;
+
+		c2 = mini_snprintf(temp,sizeof temp,"[c = %d]",c);
+		uart_printf("Formatted '%s', with c2=%d;\n",temp,c2);
+	}
 
 	for (;;) {
-        for (j=0; j<repeat;j++){
-            gpio_clear(GPIOC,GPIO13);	/* LED on */
-            for (i = 0; i < delay*3; i++)	/* Wait a bit. */
-                __asm__("nop");
-
-            gpio_set(GPIOC,GPIO13);		/* LED off */
-            for (i = 0; i < delay; i++)	/* Wait a bit. */
-                __asm__("nop");
-        }
-		
-        gpio_clear(GPIOC,GPIO13);	/* LED on */
-        for (i = 0; i < delay*30; i++)	/* Wait a bit. */
-            __asm__("nop");
-		gpio_set(GPIOC,GPIO13);		/* LED off */
-		for (i = 0; i < delay*10; i++)	/* Wait a bit. */
-			__asm__("nop");
+		gpio_toggle(GPIOC,GPIO13);	// Toggle LED
+		usart_send_blocking(USART1,x+'0');
+		x = (x+1) % 10;
+		if ( ++y % 80 == 0 ) {
+			c = uart_printf("\nLine # %d or %+05d (0x%x or 0x%08x): '%20s', '%-20s', '%s'\n",count,count,count,count,"oh lait!","ok?","etc.");
+			uart_printf("Count = %d.\n",c);
+			++count;
+			pause();
+		}
 	}
 
 	return 0;
 }
+
+/* End uart.cpp */

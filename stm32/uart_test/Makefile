@@ -3,7 +3,7 @@
 ######################################################################
 
 BINARY		= uart
-SRCFILES	= main.c
+SRCFILES	= main.c miniprintf.c
 #test:
 #	@echo $(TOP_DIR)
 #	@echo '$(OPENCM3_DIR)'	
