@@ -89,6 +89,8 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
                    - boundary condition
 
 
+
+
 ## Network protocol
 1. 流量工程 https://github.com/Kong/kong
 
@@ -96,3 +98,17 @@ https://littleosbook.github.io/ https://web.archive.org/web/20160412174753/http:
 ## VHDL
 1. Static Timing Analysis for Nanometer Designs: A Practical Approach
 2. advanced digital design with the verilog hdl
+
+
+## MCU
+1. program and erase flash memory
+PRFTBS PRFTBE HLFCYA LATENCG
+adress offset 
+
+2. boot configuration
+    main flash memory / system memory / embedded SRAM
+
+3. Embedded bootloader
+
+4. CRC 循环冗余位check
+
