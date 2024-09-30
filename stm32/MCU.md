@@ -9,5 +9,6 @@ Saturated (some), Divide
 sudo stty -F /dev/ttyUSB0 -a
 
 # baud rate to 38400, 8 bits, 1 stop bit, no parity:
-sudo stty -F /dev/ttyUSB0 38400 cs8 -cstopb -parenb -echo -icanon -onlcr
+chmod 666 /dev/ttyUSB0 
+stty -F /dev/ttyUSB0 38400 cs8 -cstopb -parenb -echo -icanon -onlcr
 ```
