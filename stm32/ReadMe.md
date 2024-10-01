@@ -71,7 +71,7 @@ make install-target-libgcc
 
 ```
 
-cd newlib-cygwin/
+cd ../newlib-cygwin-cygwin-3.5.4/
 mkdir ../newlib-arm32-aout
 cd ../newlib-arm32-aout
 ../newlib-cygwin-cygwin-3.5.4/configure --target=$TARGET_ARM32 --prefix="$PREFIX_ARM32"
@@ -80,3 +80,18 @@ make install
 
 ```
 
+## libopencm3 
+
+```
+# only need make f1
+make TARGETS='stm32/f1'
+
+```
+
+## stlink
+
+```
+apt-get install libusb-1.0
+make release 
+make install
+```
