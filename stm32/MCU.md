@@ -12,3 +12,12 @@ sudo stty -F /dev/ttyUSB0 -a
 chmod 666 /dev/ttyUSB0 
 stty -F /dev/ttyUSB0 38400 cs8 -cstopb -parenb -echo -icanon -onlcr
 ```
+
+# Major catagories in RTOS
+1. multitasking and scheduling
+    preemptive multitasking
+    cooperative multitasking (coroutines)
+2. Message queues
+3. semaphores and mutexes
+4. timers 
+5. event groups
