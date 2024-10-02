@@ -8,10 +8,10 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 
-extern void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName);
+extern void vApplicationStackOverflowHook(TaskHandle_t pxTask, portCHAR *pcTaskName);
 
 void
-vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName) {
+vApplicationStackOverflowHook(TaskHandle_t pxTask, portCHAR *pcTaskName) {
 	(void)pxTask;
 	(void)pcTaskName;
 	for(;;);
