@@ -12,6 +12,15 @@
 #include "common.h"
 #include "usbcdc.h"
 
+// Todo what is this
+void
+vApplicationStackOverflowHook(TaskHandle_t xTask, portCHAR *pcTaskName) {
+	(void)xTask;
+	(void)pcTaskName;
+	for(;;){
+	};
+}
+
 static SemaphoreHandle_t sem_flash = 0;
 
 static void

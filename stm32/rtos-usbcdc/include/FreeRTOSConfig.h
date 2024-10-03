@@ -15,7 +15,8 @@
 #define configUSE_TRACE_FACILITY	0
 #define configUSE_16_BIT_TICKS		0   // not in template
 #define configIDLE_SHOULD_YIELD		1
-#define configUSE_MUTEXES		0
+#define configUSE_MUTEXES		1
+#define configSUPPORT_DYNAMIC_ALLOCATION    1
 #define configCHECK_FOR_STACK_OVERFLOW	1
 
 /* Co-routine definitions. */

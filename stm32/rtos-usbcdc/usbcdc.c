@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 #include "usbcdc.h"
-#include <miniprintf.h>
+#include "miniprintf.h"
 #include <getline.h>
 
 // True when USB configured:
