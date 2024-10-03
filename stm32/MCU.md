@@ -11,6 +11,11 @@ sudo stty -F /dev/ttyUSB0 -a
 # baud rate to 38400, 8 bits, 1 stop bit, no parity:
 chmod 666 /dev/ttyUSB0 
 stty -F /dev/ttyUSB0 38400 cs8 -cstopb -parenb -echo -icanon -onlcr
+
+# USB port
+# USB cdc https://github.com/libopencm3/libopencm3-examples/tree/master/examples/stm32/f1/stm32-maple/usb_cdcacm
+stty -F /dev/ttyACM0  115200  cs8 -cstopb -parenb -echo -icanon -onlcr
+
 ```
 
 # Major catagories in RTOS
