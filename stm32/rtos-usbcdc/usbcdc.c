@@ -25,7 +25,7 @@
 
 #include "usbcdc.h"
 #include "miniprintf.h"
-#include <getline.h>
+#include "getline.h"
 
 // True when USB configured:
 static volatile bool initialized = false;
