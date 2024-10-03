@@ -2,7 +2,7 @@
 #  Project
 ######################################################################
 
-BINARY		= rtos-template
+BINARY		= rtos-usbcdc
 SRCFILES	= main.c 
 SRCFILES += usbcdc.c
 SRCFILES += adventure.c
