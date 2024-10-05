@@ -6,11 +6,13 @@
  * with full responsibility and at your own risk.
  */
 #include <string.h>
+#include <stdbool.h>
 #include "miniprintf.h"
 
-/*
+/*********************************************************************
  * Internal structure for I/O
- */
+ *********************************************************************/
+
 struct s_mini_args {
 	void	(*putc)(char,void *);	// The putc() function to invoke
 	void 	*argp;			// Associated data struct
@@ -18,10 +20,11 @@ struct s_mini_args {
 
 typedef struct s_mini_args miniarg_t;	// Abbreviated ref to s_mini_args
 
-/*
+/*********************************************************************
  * Internal: Write string msg until null byte, to the I/O
  *           routine described by s_mini_args.
- */
+ *********************************************************************/
+
 static void
 mini_write(miniarg_t *mini,const char *msg) {
 	char ch;
@@ -30,9 +33,10 @@ mini_write(miniarg_t *mini,const char *msg) {
 		mini->putc(ch,mini->argp);
 }
 
-/*
+/*********************************************************************
  * Internal: Pad % field to width, give text buffer.
- */
+ *********************************************************************/
+
 static void
 mini_pad(miniarg_t *mini,char pad,int width,const char *text) {
 	int slen;
@@ -45,16 +49,21 @@ mini_pad(miniarg_t *mini,char pad,int width,const char *text) {
 	}
 }
 
-/*
+/*********************************************************************
  * Internal: mini_printf() engine.
- */
+ *********************************************************************/
+
 static void
 internal_vprintf(miniarg_t *mini,const char *format,va_list arg) {
 	char ch, pad, sgn;	/* Current char, pad char and sign char */
 	int vint, width;	/* Integer value to print and field width */
+	long vlong;
 	unsigned uint;		/* Unsigned value to print */
+	unsigned long ulong;	/* Unsigned long value to print */
 	const char *sptr;	/* String to print */
-	char buf[32], *bptr;	/* Formatting buffer for int/uint */
+	char buf[40], *bptr;	/* Formatting buffer for int/uint */
+	char ccase = 0;
+	bool longf;		/* True when %ld */
 
 	while ( (ch = *format++) != 0 ) {
 		if ( ch != '%' ) {
@@ -89,40 +98,102 @@ internal_vprintf(miniarg_t *mini,const char *format,va_list arg) {
 		if ( !ch )
 			break;		/* Exit loop if we hit end of format string (in error) */
 
+		if ( ch == 'l' ) {
+			longf = true;
+			ch = *format++;
+		}
+
 		/*
 		 * Format according to type: d, x, or s
 		 */
 		switch ( ch ) {
 		case 'c':
-			vint = va_arg(arg,int);
+			if ( !longf )
+				vint = va_arg(arg,int);
+			else	vint = va_arg(arg,long);
 			mini->putc((char)vint,mini->argp);
 			break;
-		case 'd':		/* Decimal format */
-			vint = va_arg(arg,int);
-			if ( vint < 0 ) {
-				mini->putc('-',mini->argp);
-				vint = -vint;
-			} else if ( sgn == '+' )
-				mini->putc(sgn,mini->argp);
-			bptr = buf + sizeof buf;
-			*--bptr = 0;
-			do	{
-				*--bptr = vint % 10 + '0';
-				vint /= 10;
-			} while ( vint != 0 );
+
+		case 'u':		/* Unsigned decimal */
+			if ( !longf ) {
+				uint = va_arg(arg,unsigned);
+				bptr = buf + sizeof buf;
+				*--bptr = 0;
+				do	{
+					*--bptr = uint % 10u + '0';
+					uint /= 10u;
+				} while ( uint != 0 );
+			} else	{
+				ulong = va_arg(arg,unsigned long);
+				bptr = buf + sizeof buf;
+				*--bptr = 0;
+				do	{
+					*--bptr = ulong % 10u + '0';
+					ulong /= 10u;
+				} while ( ulong != 0 );
+			}
 			mini_pad(mini,pad,width,bptr);
 			mini_write(mini,bptr);
 			break;
 
+		case 'd':		/* Decimal format */
+			if ( !longf ) {
+				vint = va_arg(arg,int);
+				if ( vint < 0 ) {
+					mini->putc('-',mini->argp);
+					vint = -vint;
+				} else if ( sgn == '+' )
+					mini->putc(sgn,mini->argp);
+				bptr = buf + sizeof buf;
+				*--bptr = 0;
+				do	{
+					*--bptr = vint % 10 + '0';
+					vint /= 10;
+				} while ( vint != 0 );
+			} else	{
+				vlong = va_arg(arg,long);
+				if ( vlong < 0 ) {
+					mini->putc('-',mini->argp);
+					vlong = -vlong;
+				} else if ( sgn == '+' )
+					mini->putc(sgn,mini->argp);
+				bptr = buf + sizeof buf;
+				*--bptr = 0;
+				do	{
+					*--bptr = vlong % 10 + '0';
+					vlong /= 10;
+				} while ( vlong != 0 );
+			}
+			mini_pad(mini,pad,width,bptr);
+			mini_write(mini,bptr);
+			break;
+
+		case 'p':		/* Pointer: assumes pointer is sizeof(unsigned) */
+			mini_write(mini,"0x");
+			/* Fall Thru */
 		case 'x':		/* Hexadecimal format */
-			uint = va_arg(arg,unsigned);
-			bptr = buf + sizeof buf;
-			*--bptr = 0;
-			do	{
-				ch = uint & 0x0F;
-				*--bptr = ch + (ch <= 9 ? '0' : 'A'-10);
-				uint >>= 4;
-			} while ( uint != 0 );
+			ccase = 0x20;	/* Flip case */
+			/* Fall Thru */
+		case 'X':
+			if ( !longf ) {
+				uint = va_arg(arg,unsigned);
+				bptr = buf + sizeof buf;
+				*--bptr = 0;
+				do	{
+					ch = uint & 0x0F;
+					*--bptr = ch + (ch <= 9 ? '0' : ('A'^ccase)-10);
+					uint >>= 4;
+				} while ( uint != 0 );
+			} else	{
+				ulong = va_arg(arg,unsigned long);
+				bptr = buf + sizeof buf;
+				*--bptr = 0;
+				do	{
+					ch = ulong & 0x0F;
+					*--bptr = ch + (ch <= 9 ? '0' : ('A'^ccase)-10);
+					ulong >>= 4;
+				} while ( ulong != 0 );
+			}
 			mini_pad(mini,pad,width,bptr);
 			mini_write(mini,bptr);
 			break;
@@ -148,9 +219,10 @@ internal_vprintf(miniarg_t *mini,const char *format,va_list arg) {
 	}
 }
 
-/*
+/*********************************************************************
  * s_internal trackes the count of bytes output:
- */
+ *********************************************************************/
+
 struct s_internal {
 	void (*putc)(char);	/* User's putc() routine to be used */
 	unsigned count;		/* Bytes output */
@@ -171,9 +243,10 @@ mini_putc(char ch,void *argp) {
 	}
 }
 
-/*
+/*********************************************************************
  * Internal: Perform cooked/uncooked printf()
- */
+ *********************************************************************/
+
 static int
 mini_vprintf0(void (*putc)(char),int cooked,const char *format,va_list args) {
 	miniarg_t mini;
@@ -190,17 +263,19 @@ mini_vprintf0(void (*putc)(char),int cooked,const char *format,va_list args) {
 	return intern.count;		/* Return byte count */
 }
 
-/*
+/*********************************************************************
  * External: Perform cooked mode printf()
- */
+ *********************************************************************/
+
 int
 mini_vprintf_cooked(void (*putc)(char),const char *format,va_list args) {
 	return mini_vprintf0(putc,1,format,args);
 }
 
-/*
+/*********************************************************************
  * External: Perform uncooked (as is) printf()
- */
+ *********************************************************************/
+
 int
 mini_vprintf_uncooked(void (*putc)(char),const char *format,va_list args) {
 	return mini_vprintf0(putc,0,format,args);
@@ -225,9 +300,10 @@ mini_sputc(char ch,void *argp) {
 	*ctl->ptr++ = ch;
 }
 
-/*
+/*********************************************************************
  * External: sprintf() to buffer (not cooked)
- */
+ *********************************************************************/
+
 int
 mini_snprintf(char *buf,unsigned maxbuf,const char *format,...) {
 	miniarg_t mini;			/* printf struct */

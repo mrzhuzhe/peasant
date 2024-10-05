@@ -296,7 +296,7 @@ get_data24(const char *prompt) {
 	unsigned v = 0u, count = 0u;
 	char ch;
 
-	std_printf("%s: ",prompt);
+	std_printf("your cmd is data24 %s: ",prompt);
 
 	while ( (ch = std_getc()) != '\r' && ch != '\n' ) {
 		if ( ch == '\b' || ch == 0x7F ) {
@@ -334,7 +334,7 @@ get_data8(const char *prompt) {
 	char ch;
 
 	if ( prompt )
-		std_printf("%s: ",prompt);
+		std_printf("your cmd data8 %s: ",prompt);
 
 	while ( (ch = std_getc()) != '\r' && ch != '\n' && !strchr(",./;\t",ch) ) {
 		if ( ch == '"' || ch == '\'' ) {
@@ -529,7 +529,7 @@ monitor_task(void *arg __attribute((unused))) {
 	unsigned addr = 0u;
 	uint8_t data = 0, idbuf[8];
 	uint32_t info;
-	const char *device;
+	const char *device;	
 	bool menuf = true;
 	
 	std_printf("\nMonitor Task Started.\n");
@@ -557,7 +557,7 @@ monitor_task(void *arg __attribute((unused))) {
 		}
 		menuf = false;
 
-		std_printf("\n: ");
+		std_printf("your cmd is \n: ");
 		ch = std_getc();
 
 		if ( isalpha(ch) )
@@ -586,6 +586,7 @@ monitor_task(void *arg __attribute((unused))) {
 				(uint16_t)info>>8,(uint16_t)info&0xFF,
 				device);
 			break;
+		/*
 		case 'J':
 			info = w25_JEDEC_ID(SPI1);
 			devx = (int)(info & 0xFF)-0x15;	// Offset is 1 higher here
@@ -656,9 +657,11 @@ monitor_task(void *arg __attribute((unused))) {
 			load_ihex(SPI1);
 			vTaskDelay(pdMS_TO_TICKS(1500));
 			break;
+		*/
 		default:
-			std_printf(" ???\n");
+			std_printf(" default \n");
 			menuf = true;
+			break;
 		}
 	}
 }
@@ -704,11 +707,11 @@ main(void) {
 	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
 
 	spi_setup();
-	gpio_set(GPIOC,GPIO13);				// PC13 = on
+	gpio_set(GPIOC,GPIO13);				// PC13 = off
 
 	usb_start(1,1);
 	std_set_device(mcu_usb);			// Use USB for std I/O
-	gpio_clear(GPIOC,GPIO13);			// PC13 = off
+	gpio_clear(GPIOC,GPIO13);			// PC13 = on
 
 	xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
 	vTaskStartScheduler();
