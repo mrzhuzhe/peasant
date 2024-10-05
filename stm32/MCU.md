@@ -14,8 +14,13 @@ stty -F /dev/ttyUSB0 38400 cs8 -cstopb -parenb -echo -icanon -onlcr
 
 # USB port
 # USB cdc https://github.com/libopencm3/libopencm3-examples/tree/master/examples/stm32/f1/stm32-maple/usb_cdcacm
+chmod 666 /dev/ttyACM0 
 stty -F /dev/ttyACM0  115200  cs8 -cstopb -parenb -echo -icanon -onlcr
 
+
+# USB spi
+chmod 666 /dev/ttyACM0 
+stty -F /dev/ttyACM0  2400  cs8 -cstopb -parenb
 ```
 
 # Major catagories in RTOS
