@@ -1,12 +1,5 @@
-/* USB Serial interface
- * This module inspired by libopencm3/libopencm3-examples usbcdc.c
- * by Gareth McMullin <gareth@blacksphere.co.nz>
+/* Packaged FreeRTOS usbcdc library
  * Warren W. Gay VE3WWG
- *
- * GPIO
- * ----
- * PA11		USB_DM
- * PA12		USB_DP
  */
 #include <stdlib.h>
 #include <string.h>
@@ -21,17 +14,14 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
-#include <stdbool.h>
 
-#include "usbcdc.h"
-#include "miniprintf.h"
-#include "getline.h"
+#include <usbcdc.h>
+#include <miniprintf.h>
+#include <getline.h>
 
-// True when USB configured:
-static volatile bool initialized = false;
-
-static QueueHandle_t usb_txq;	// USB transmit queue
-static QueueHandle_t usb_rxq;	// USB receive queue
+static volatile char initialized = 0;			// True when USB configured
+static QueueHandle_t usb_txq;				// USB transmit queue
+static QueueHandle_t usb_rxq;				// USB receive queue
 
 static const struct usb_device_descriptor dev = {
 	.bLength = USB_DT_DEVICE_SIZE,
@@ -149,6 +139,7 @@ static const struct usb_interface_descriptor data_iface[] = {
 		.bInterfaceSubClass = 0,
 		.bInterfaceProtocol = 0,
 		.iInterface = 0,
+
 		.endpoint = data_endp,
 	}
 };
@@ -172,104 +163,83 @@ static const struct usb_config_descriptor config = {
 	.iConfiguration = 0,
 	.bmAttributes = 0x80,
 	.bMaxPower = 0x32,
+
 	.interface = ifaces,
 };
 
 static const char * usb_strings[] = {
-	"usbcdc.c driver",
-	"usbcdc module",
-	"usbcdcdemo",
+	"libusbcdc.c driver",
+	"CDC-ACM module",
+	"WGDEMO",
 };
 
-// Buffer to be used for control requests.
-static uint8_t usbd_control_buffer[128];
+/* Buffer to be used for control requests. */
+uint8_t usbd_control_buffer[128];
 
-/*
- * USB Control Requests:
- */
 static enum usbd_request_return_codes
 cdcacm_control_request(
-  usbd_device *usbd_dev __attribute__((unused)),
+  usbd_device *usbd_dev,
   struct usb_setup_data *req,
-  uint8_t **buf __attribute__((unused)),
+  uint8_t **buf,
   uint16_t *len,
-  void (**complete)(
-    usbd_device *usbd_dev,
-    struct usb_setup_data *req
-  ) __attribute__((unused))
+  void (**complete)(usbd_device *usbd_dev,struct usb_setup_data *req)
 ) {
+	(void)complete;
+	(void)buf;
+	(void)usbd_dev;
 
 	switch (req->bRequest) {
-	case USB_CDC_REQ_SET_CONTROL_LINE_STATE:
+	case USB_CDC_REQ_SET_CONTROL_LINE_STATE: {
 		/*
-		 * The Linux cdc_acm driver requires this to be implemented
+		 * This Linux cdc_acm driver requires this to be implemented
 		 * even though it's optional in the CDC spec, and we don't
 		 * advertise it in the ACM functional descriptor.
 		 */
 		return USBD_REQ_HANDLED;
+		}
 	case USB_CDC_REQ_SET_LINE_CODING:
-		if ( *len < sizeof(struct usb_cdc_line_coding) ) {
+		if (*len < sizeof(struct usb_cdc_line_coding)) {
 			return USBD_REQ_NOTSUPP;
 		}
+
 		return USBD_REQ_HANDLED;
 	}
 	return USBD_REQ_NOTSUPP;
 }
 
-/*
- * USB Receive Callback:
- */
 static void
-cdcacm_data_rx_cb(
-  usbd_device *usbd_dev,
-  uint8_t ep __attribute__((unused))
-) {
-	// How much queue capacity left?
-	unsigned rx_avail = uxQueueSpacesAvailable(usb_rxq);
-	char buf[64];	// rx buffer
+cdcacm_data_rx_cb(usbd_device *usbd_dev, uint8_t ep) {
+	unsigned rx_avail = uxQueueSpacesAvailable(usb_rxq);	/* How much queue capacity left? */
+	char buf[64];						/* rx buffer */
 	int len, x;
 
+	(void)ep;
+
 	if ( rx_avail <= 0 )
-		return;	// No space to rx
+		return;						/* No space to rx */
 
-	// Bytes to read
-	len = sizeof buf < rx_avail ? sizeof buf : rx_avail;
+	len = sizeof buf < rx_avail ? sizeof buf : rx_avail;	/* Bytes to read */
+	len = usbd_ep_read_packet(usbd_dev,0x01,buf,len);	/* Read what we can, leave the rest */
 
-	// Read what we can, leave the rest:
-	len = usbd_ep_read_packet(usbd_dev,0x01,buf,len);
-
-	for ( x=0; x<len; ++x ) {
-		// Send data to the rx queue
-		xQueueSend(usb_rxq,&buf[x],0);
-	}
+	for ( x=0; x<len; ++x )
+		xQueueSend(usb_rxq,&buf[x],0);			/* Send data to the rx queue */
 }
 
-/*
- * USB Configuration:
- */
 static void
-cdcacm_set_config(
-  usbd_device *usbd_dev,
-  uint16_t wValue __attribute__((unused))
-) {
+cdcacm_set_config(usbd_device *usbd_dev, uint16_t wValue) {
+	(void)wValue;
 
-	usbd_ep_setup(usbd_dev,
-		0x01,
-		USB_ENDPOINT_ATTR_BULK,
-		64,
-		cdcacm_data_rx_cb);
-	usbd_ep_setup(usbd_dev,
-		0x82,
-		USB_ENDPOINT_ATTR_BULK,
-		64,
-		NULL);
+	usbd_ep_setup(usbd_dev,0x01,USB_ENDPOINT_ATTR_BULK,64,cdcacm_data_rx_cb);
+	usbd_ep_setup(usbd_dev,0x82,USB_ENDPOINT_ATTR_BULK,64,NULL);
+	usbd_ep_setup(usbd_dev,0x83,USB_ENDPOINT_ATTR_INTERRUPT,16,NULL);
+
 	usbd_register_control_callback(
 		usbd_dev,
 		USB_REQ_TYPE_CLASS | USB_REQ_TYPE_INTERFACE,
 		USB_REQ_TYPE_TYPE | USB_REQ_TYPE_RECIPIENT,
 		cdcacm_control_request);
 
-	initialized = true;
+	initialized = 1;
 }
 
 /*
@@ -278,14 +248,13 @@ cdcacm_set_config(
 static void
 usb_task(void *arg) {
 	usbd_device *udev = (usbd_device *)arg;
-	char txbuf[32];
+	char txbuf[64];
 	unsigned txlen = 0;
 
 	for (;;) {
 		usbd_poll(udev);			/* Allow driver to do it's thing */
 		if ( initialized ) {
-			while ( txlen < sizeof txbuf
-			   && xQueueReceive(usb_txq,&txbuf[txlen],0) == pdPASS )
+			while ( txlen < sizeof txbuf && xQueueReceive(usb_txq,&txbuf[txlen],0) == pdPASS )
 				++txlen;		/* Read data to be sent */
 			if ( txlen > 0 ) {
 				if ( usbd_ep_write_packet(udev,0x82,txbuf,txlen) != 0 )
@@ -293,6 +262,8 @@ usb_task(void *arg) {
 			} else	{
 				taskYIELD();		/* Then give up CPU */
 			}
+		} else	{
+			taskYIELD();
 		}
 	}
 }
@@ -362,49 +333,129 @@ usb_write(const char *buf,unsigned bytes) {
 int
 usb_getc(void) {
 	char ch;
-	uint32_t rc;
 
-	rc = xQueueReceive(usb_rxq,&ch,portMAX_DELAY);
-	if ( rc != pdPASS )
+	if ( xQueueReceive(usb_rxq,&ch,portMAX_DELAY) != pdPASS )
 		return -1;
 	return ch;
 }
 
 /*
- * Get an edited input line
+ * Peek to see if there is more input from USB:
+ *
+ * RETURNS:
+ *	1	At least one character is waiting to be read
+ *	0	No data to read.
+ *	-1	USB error (disconnected?)
  */
 int
-usb_getline(char *buf,unsigned bufsiz) {
-	return getline(buf,bufsiz,usb_getc,usb_putc);
+usb_peek(void) {
+	char ch;
+	uint32_t rc;
+
+	rc = xQueuePeek(usb_rxq,&ch,0);
+
+	switch ( rc ) {
+	case errQUEUE_EMPTY:
+		return 0;
+	case pdPASS:
+		return 1;
+	default:
+		return -1;
+	}
+}
+
+/*
+ * Get a line of text ending with CF / LF,
+ * (blocking). Input is echoed.
+ *
+ * ARGUMENTS:
+ *	buf		Input buffer
+ *	maxbuf		Maximum # of bytes
+ *
+ * RETURNS:
+ *	# of bytes read
+ *
+ * NOTES:
+ *	Reading stops with first CR/LF, or
+ *	maximum length, whichever occurs
+ *	first.
+ */
+int
+usb_gets(char *buf,unsigned maxbuf) {
+	unsigned bx = 0;
+	int ch;
+	
+	while ( maxbuf > 0 && bx+1 < maxbuf ) {
+		ch = usb_getc();
+		if ( ch == -1 ) {
+			if ( !bx )
+				return -1;
+			break;
+		}
+		if ( ch == '\r' || ch == '\n' ) {
+			buf[bx++] = '\n';
+			usb_putc('\n');
+			break;
+		}
+		buf[bx++] = (char)ch;
+		usb_putc(ch);
+	}
+	
+	buf[bx] = 0;
+	return bx;
+}
+ 					
+/*
+ * Get an edited line:
+ */
+int
+usb_getline(char *buf,unsigned maxbuf) {
+
+	return getline(buf,maxbuf,usb_getc,usb_putc);
 }
 
 /*
  * Start USB driver:
+ *
+ * ARGUMENTS:
+ *	gpio_init	When true, setup RCC and GPIOA for USB
  */
 void
-usb_start(void) {
+usb_start(bool gpio_init,unsigned priority) {
 	usbd_device *udev = 0;
 
 	usb_txq = xQueueCreate(128,sizeof(char));
 	usb_rxq = xQueueCreate(128,sizeof(char));
 
-	rcc_periph_clock_enable(RCC_GPIOA);
-	rcc_periph_clock_enable(RCC_USB);
+	if ( gpio_init ) {
+		rcc_periph_clock_enable(RCC_GPIOA);
+		rcc_periph_clock_enable(RCC_USB);
+	}
 
-	// PA11=USB_DM, PA12=USB_DP
 	udev = usbd_init(&st_usbfs_v1_usb_driver,&dev,&config,
 		usb_strings,3,
 		usbd_control_buffer,sizeof(usbd_control_buffer));
 
 	usbd_register_set_config_callback(udev,cdcacm_set_config);
 
-	xTaskCreate(usb_task,"USB",200,udev,configMAX_PRIORITIES-1,NULL);
+	xTaskCreate(usb_task,"USB",300,udev,priority,NULL);
 }
 
 /*
  * Return True if the USB connection + driver initialized and ready.
  */
-bool
+int
 usb_ready(void) {
 	return initialized;
 }
+
+/*
+ * Yield until USB ready:
+ */
+void
+usb_yield(void) {
+	while ( !initialized )
+		taskYIELD();
+}
+
+/* End libusbcdc.c */

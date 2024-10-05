@@ -24,6 +24,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "opencm3.h"
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
@@ -694,7 +695,7 @@ spi_setup(void) {
 int
 main(void) {
 
-	rcc_clock_setup_in_hse_8mhz_out_72mhz();	// Blue pill
+	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOC);
