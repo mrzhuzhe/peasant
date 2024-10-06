@@ -20,7 +20,7 @@ stty -F /dev/ttyACM0  115200  cs8 -cstopb -parenb -echo -icanon -onlcr
 
 # USB spi
 chmod 666 /dev/ttyACM0 
-stty -F /dev/ttyACM0  2400  cs8 -cstopb -parenb
+stty -F /dev/ttyACM0  2400  cs8 -cstopb -parenb -echo -icanon -onlcr
 ```
 
 # Major catagories in RTOS
