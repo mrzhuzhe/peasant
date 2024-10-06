@@ -25,7 +25,6 @@
 #include "task.h"
 #include "queue.h"
 #include "opencm3.h"
-
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
@@ -61,10 +60,14 @@ static const char *cap[3] = {
 static uint8_t
 w25_read_sr1(uint32_t spi) {
 	uint8_t sr1;
-
+	usb_printf("\n w25_read_sr1.\n");
 	spi_enable(spi);
-	spi_xfer(spi,W25_CMD_READ_SR1);
+	usb_printf("\n w25_read_sr1 2.\n");
+	//spi_xfer(spi,W25_CMD_READ_SR1);		//	bug here
+	spi_xfer(spi, W25_CMD_READ_SR1);		//	bug here
+	usb_printf("\n w25_read_sr1 3.\n");
 	sr1 = spi_xfer(spi,DUMMY);
+	usb_printf("\n w25_read_sr1 4.\n");
 	spi_disable(spi);
 	return sr1;
 }
@@ -110,7 +113,9 @@ static uint16_t
 w25_manuf_device(uint32_t spi) {
 	uint16_t info;
 
+	usb_printf("\Monitor Task Started 2.\n");
 	w25_wait(spi);
+	usb_printf("\Monitor Task Started 3.\n");
 	spi_enable(spi);
 	spi_xfer(spi,W25_CMD_MANUF_DEVICE);	// Byte 1
 	spi_xfer(spi,DUMMY);			// Dummy1 (2)
@@ -296,7 +301,7 @@ get_data24(const char *prompt) {
 	unsigned v = 0u, count = 0u;
 	char ch;
 
-	std_printf("your cmd is data24 %s: ",prompt);
+	std_printf("%s: ",prompt);
 
 	while ( (ch = std_getc()) != '\r' && ch != '\n' ) {
 		if ( ch == '\b' || ch == 0x7F ) {
@@ -334,7 +339,7 @@ get_data8(const char *prompt) {
 	char ch;
 
 	if ( prompt )
-		std_printf("your cmd data8 %s: ",prompt);
+		std_printf("%s: ",prompt);
 
 	while ( (ch = std_getc()) != '\r' && ch != '\n' && !strchr(",./;\t",ch) ) {
 		if ( ch == '"' || ch == '\'' ) {
@@ -529,11 +534,25 @@ monitor_task(void *arg __attribute((unused))) {
 	unsigned addr = 0u;
 	uint8_t data = 0, idbuf[8];
 	uint32_t info;
-	const char *device;	
+	const char *device;
 	bool menuf = true;
 	
-	std_printf("\nMonitor Task Started.\n");
+	while (1) {
+		vTaskDelay(pdMS_TO_TICKS(500));
+		std_printf("\nMonitor Task Started.\n");
+		info = w25_manuf_device(SPI1);
+	}
+	//
 
+	// devx = (int)(info & 0xFF)-0x14;
+	// if ( devx < 3 )
+	// 	device = cap[devx];
+	// else	device = "unknown";
+	// std_printf("Manufacturer $%02X Device $%02X (%s)\n",
+	// 	(uint16_t)info>>8,(uint16_t)info&0xFF,
+	// 	device);
+
+	/*
 	for (;;) {
 		if ( menuf ) {
 			std_printf(
@@ -557,25 +576,25 @@ monitor_task(void *arg __attribute((unused))) {
 		}
 		menuf = false;
 
-		std_printf("your cmd is \n: ");
+		std_printf("\n: ");
 		ch = std_getc();
 
 		if ( isalpha(ch) )
 			ch = toupper(ch);
-		std_printf("%c\n",ch);
+		std_printf("your cmd is %c\n",ch);
 
 		switch ( ch ) {
 		case '?':
 		case '\r':
 		case '\n':
 			menuf = true;
-			break;		
+			break;			
 		case '0':
 			w25_power(SPI1,0);
 			break;
 		case '1':
 			w25_power(SPI1,1);
-			break;
+			break;		
 		case 'I':
 			info = w25_manuf_device(SPI1);
 			devx = (int)(info & 0xFF)-0x14;
@@ -586,7 +605,6 @@ monitor_task(void *arg __attribute((unused))) {
 				(uint16_t)info>>8,(uint16_t)info&0xFF,
 				device);
 			break;
-		/*
 		case 'J':
 			info = w25_JEDEC_ID(SPI1);
 			devx = (int)(info & 0xFF)-0x15;	// Offset is 1 higher here
@@ -657,13 +675,13 @@ monitor_task(void *arg __attribute((unused))) {
 			load_ihex(SPI1);
 			vTaskDelay(pdMS_TO_TICKS(1500));
 			break;
-		*/
 		default:
-			std_printf(" default \n");
+			std_printf(" ???\n");
 			menuf = true;
 			break;
 		}
 	}
+	*/
 }
 
 static void
@@ -698,7 +716,7 @@ spi_setup(void) {
 int
 main(void) {
 
-	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
+	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);	// Blue pill
 
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOC);
@@ -706,12 +724,12 @@ main(void) {
 	// LED on PC13
 	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
 
-	spi_setup();
-	gpio_set(GPIOC,GPIO13);				// PC13 = off
+	//spi_setup();
+	gpio_clear(GPIOC,GPIO13);				// PC13 = on
 
 	usb_start(1,1);
-	std_set_device(mcu_usb);			// Use USB for std I/O
-	gpio_clear(GPIOC,GPIO13);			// PC13 = on
+	//std_set_device(mcu_usb);			// Use USB for std I/O
+	gpio_set(GPIOC,GPIO13);			// PC13 = off
 
 	xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
 	vTaskStartScheduler();
