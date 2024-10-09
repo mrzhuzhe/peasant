@@ -109,7 +109,6 @@ w25_manuf_device(uint32_t spi) {
 	uint16_t info;
 
 	w25_wait(spi);
-	usb_printf("456456456.\n");
 	spi_enable(spi);
 	spi_xfer(spi,W25_CMD_MANUF_DEVICE);	// Byte 1
 	spi_xfer(spi,DUMMY);			// Dummy1 (2)
@@ -118,7 +117,6 @@ w25_manuf_device(uint32_t spi) {
 	info = spi_xfer(spi,DUMMY) << 8;	// Byte 5
 	info |= spi_xfer(spi,DUMMY);		// Byte 6
 	spi_disable(spi);
-	usb_printf("123123123.\n");
 	return info;
 }
 
@@ -531,29 +529,8 @@ monitor_task(void *arg __attribute((unused))) {
 	uint32_t info;
 	const char *device;
 	bool menuf = true;
+
 	
-	while (1) {
-		vTaskDelay(pdMS_TO_TICKS(500));
-		std_printf("\nMonitor Task Started.\n");
-		info = w25_manuf_device(SPI1);
-		// devx = (int)(info & 0xFF)-0x14;
-		// if ( devx < 3 )
-		// 	device = cap[devx];
-		// else	device = "unknown";
-		// std_printf("Manufacturer $%02X Device $%02X (%s)\n",
-		// 	(uint16_t)info>>8,(uint16_t)info&0xFF,
-		// 	device);
-	}
-
-	// devx = (int)(info & 0xFF)-0x14;
-	// if ( devx < 3 )
-	// 	device = cap[devx];
-	// else	device = "unknown";
-	// std_printf("Manufacturer $%02X Device $%02X (%s)\n",
-	// 	(uint16_t)info>>8,(uint16_t)info&0xFF,
-	// 	device);
-
-	/*
 	for (;;) {
 		if ( menuf ) {
 			std_printf(
@@ -582,7 +559,7 @@ monitor_task(void *arg __attribute((unused))) {
 
 		if ( isalpha(ch) )
 			ch = toupper(ch);
-		std_printf("your cmd is %c\n",ch);
+		std_printf("input: %c\n",ch);
 
 		switch ( ch ) {
 		case '?':
@@ -599,6 +576,7 @@ monitor_task(void *arg __attribute((unused))) {
 		case 'I':
 			info = w25_manuf_device(SPI1);
 			devx = (int)(info & 0xFF)-0x14;
+			devx = 2; // Todo ad hoc devx 2 info data has some problem need debug method
 			if ( devx < 3 )
 				device = cap[devx];
 			else	device = "unknown";
@@ -609,6 +587,7 @@ monitor_task(void *arg __attribute((unused))) {
 		case 'J':
 			info = w25_JEDEC_ID(SPI1);
 			devx = (int)(info & 0xFF)-0x15;	// Offset is 1 higher here
+			devx = 2; // Todo ad hoc devx 2 info data has some problem need debug method
 			if ( devx < 3 )
 				device = cap[devx];
 			else	device = "unknown";
@@ -681,8 +660,7 @@ monitor_task(void *arg __attribute((unused))) {
 			menuf = true;
 			break;
 		}
-	}
-	*/
+	}	
 }
 
 static void
