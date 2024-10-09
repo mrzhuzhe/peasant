@@ -60,14 +60,9 @@ static const char *cap[3] = {
 static uint8_t
 w25_read_sr1(uint32_t spi) {
 	uint8_t sr1;
-	usb_printf("\n w25_read_sr1.\n");
 	spi_enable(spi);
-	usb_printf("\n w25_read_sr1 2.\n");
-	//spi_xfer(spi,W25_CMD_READ_SR1);		//	bug here
-	spi_xfer(spi, W25_CMD_READ_SR1);		//	bug here
-	usb_printf("\n w25_read_sr1 3.\n");
+	spi_xfer(spi, W25_CMD_READ_SR1);
 	sr1 = spi_xfer(spi,DUMMY);
-	usb_printf("\n w25_read_sr1 4.\n");
 	spi_disable(spi);
 	return sr1;
 }
@@ -113,9 +108,8 @@ static uint16_t
 w25_manuf_device(uint32_t spi) {
 	uint16_t info;
 
-	usb_printf("\Monitor Task Started 2.\n");
 	w25_wait(spi);
-	usb_printf("\Monitor Task Started 3.\n");
+	usb_printf("456456456.\n");
 	spi_enable(spi);
 	spi_xfer(spi,W25_CMD_MANUF_DEVICE);	// Byte 1
 	spi_xfer(spi,DUMMY);			// Dummy1 (2)
@@ -124,6 +118,7 @@ w25_manuf_device(uint32_t spi) {
 	info = spi_xfer(spi,DUMMY) << 8;	// Byte 5
 	info |= spi_xfer(spi,DUMMY);		// Byte 6
 	spi_disable(spi);
+	usb_printf("123123123.\n");
 	return info;
 }
 
@@ -541,8 +536,14 @@ monitor_task(void *arg __attribute((unused))) {
 		vTaskDelay(pdMS_TO_TICKS(500));
 		std_printf("\nMonitor Task Started.\n");
 		info = w25_manuf_device(SPI1);
+		// devx = (int)(info & 0xFF)-0x14;
+		// if ( devx < 3 )
+		// 	device = cap[devx];
+		// else	device = "unknown";
+		// std_printf("Manufacturer $%02X Device $%02X (%s)\n",
+		// 	(uint16_t)info>>8,(uint16_t)info&0xFF,
+		// 	device);
 	}
-	//
 
 	// devx = (int)(info & 0xFF)-0x14;
 	// if ( devx < 3 )
@@ -724,11 +725,11 @@ main(void) {
 	// LED on PC13
 	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
 
-	//spi_setup();
+	spi_setup();
 	gpio_clear(GPIOC,GPIO13);				// PC13 = on
 
 	usb_start(1,1);
-	//std_set_device(mcu_usb);			// Use USB for std I/O
+	std_set_device(mcu_usb);			// Use USB for std I/O
 	gpio_set(GPIOC,GPIO13);			// PC13 = off
 
 	xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
