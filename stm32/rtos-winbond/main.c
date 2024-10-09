@@ -13,6 +13,8 @@
  *	PA5	SCK
  *	PA6	MISO
  *	PA7	MOSI
+
+ // Todo init fail https://github.com/coderwhq/learning-STM32/blob/main/11-1_%E8%BD%AF%E4%BB%B6SPI%E8%AF%BB%E5%86%99W25Q64/Hardware/W25Q64.c
  */
 #include <string.h>
 #include <ctype.h>
