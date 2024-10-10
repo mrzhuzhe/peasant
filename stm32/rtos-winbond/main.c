@@ -15,6 +15,7 @@
  *	PA7	MOSI
 
  // Todo init fail https://github.com/coderwhq/learning-STM32/blob/main/11-1_%E8%BD%AF%E4%BB%B6SPI%E8%AF%BB%E5%86%99W25Q64/Hardware/W25Q64.c
+ https://github.com/libopencm3/libopencm3-examples/blob/master/examples/stm32/f1/lisa-m-2/spi/spi.c
  */
 #include <string.h>
 #include <ctype.h>
@@ -682,16 +683,23 @@ spi_setup(void) {
 		GPIO6				// MISO=PA6
 	);
 	rcc_periph_reset_pulse(RST_SPI1);
-	spi_init_master(
-		SPI1,
-                SPI_CR1_BAUDRATE_FPCLK_DIV_256,
-                SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-		SPI_CR1_CPHA_CLK_TRANSITION_1,
-	        SPI_CR1_DFF_8BIT,
-	        SPI_CR1_MSBFIRST
-	);
-	spi_disable_software_slave_management(SPI1);
-	spi_enable_ss_output(SPI1);
+	// spi_init_master(
+	// 	SPI1,
+    //             SPI_CR1_BAUDRATE_FPCLK_DIV_256,
+    //             SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+	// 	SPI_CR1_CPHA_CLK_TRANSITION_1,
+	//         SPI_CR1_DFF_8BIT,
+	//         SPI_CR1_MSBFIRST
+	// );
+	spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+                  SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+	// spi_disable_software_slave_management(SPI1);
+	// spi_enable_ss_output(SPI1);
+	spi_enable_software_slave_management(SPI1);
+	spi_set_nss_high(SPI1);
+
+	/* Enable SPI1 periph. */
+	spi_enable(SPI1);
 }
 
 int
