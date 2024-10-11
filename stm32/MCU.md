@@ -36,6 +36,6 @@ stty -F /dev/ttyACM0  2400  cs8 -cstopb -parenb -echo -icanon -onlcr
 
 st-util -p 4500
 
-(gdb) target extended-remote localhost:4500
+(arm-none-eabi-gdb) target extended-remote localhost:4500
 
-(gdb) file rtos-template.elf
+(arm-none-eabi-gdb) file rtos-template.elf
