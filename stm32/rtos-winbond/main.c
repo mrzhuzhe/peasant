@@ -27,10 +27,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "opencm3.h"
+
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
+#include "opencm3.h"
 
 #define W25_CMD_MANUF_DEVICE	0x90
 #define W25_CMD_JEDEC_ID	0x9F
@@ -533,6 +534,17 @@ monitor_task(void *arg __attribute((unused))) {
 	const char *device;
 	bool menuf = true;
 
+	info = w25_manuf_device(SPI1);
+	devx = (int)(info & 0xFF)-0x14;
+	devx = 2; // Todo ad hoc devx 2 info data has some problem need debug method
+	if ( devx < 3 )
+		device = cap[devx];
+	else	device = "unknown";
+	std_printf("Manufacturer $%02X Device $%02X (%s)\n",
+		(uint16_t)info>>8,(uint16_t)info&0xFF,
+		device);
+	return;
+
 	
 	for (;;) {
 		if ( menuf ) {
@@ -683,23 +695,23 @@ spi_setup(void) {
 		GPIO6				// MISO=PA6
 	);
 	rcc_periph_reset_pulse(RST_SPI1);
-	// spi_init_master(
-	// 	SPI1,
-    //             SPI_CR1_BAUDRATE_FPCLK_DIV_256,
-    //             SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-	// 	SPI_CR1_CPHA_CLK_TRANSITION_1,
-	//         SPI_CR1_DFF_8BIT,
-	//         SPI_CR1_MSBFIRST
-	// );
-	spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
-                  SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-	// spi_disable_software_slave_management(SPI1);
-	// spi_enable_ss_output(SPI1);
-	spi_enable_software_slave_management(SPI1);
-	spi_set_nss_high(SPI1);
+	spi_init_master(
+		SPI1,
+                SPI_CR1_BAUDRATE_FPCLK_DIV_256,
+                SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
+		SPI_CR1_CPHA_CLK_TRANSITION_1,
+	        SPI_CR1_DFF_8BIT,
+	        SPI_CR1_MSBFIRST
+	);
+	// spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+    //               SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+	spi_disable_software_slave_management(SPI1);
+	spi_enable_ss_output(SPI1);
+	// spi_enable_software_slave_management(SPI1);
+	// spi_set_nss_high(SPI1);
 
 	/* Enable SPI1 periph. */
-	spi_enable(SPI1);
+	//spi_enable(SPI1);
 }
 
 int
@@ -720,8 +732,16 @@ main(void) {
 	std_set_device(mcu_usb);			// Use USB for std I/O
 	gpio_set(GPIOC,GPIO13);			// PC13 = off
 
-	xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
-	vTaskStartScheduler();
+	int ch, devx;
+	unsigned addr = 0u;
+	uint8_t data = 0, idbuf[8];
+	uint32_t info;
+	const char *device;
+	
+	info = w25_manuf_device(SPI1);
+	devx = (int)(info & 0xFF)-0x14;
+	// xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
+	// vTaskStartScheduler();
 	for (;;);
 	return 0;
 }

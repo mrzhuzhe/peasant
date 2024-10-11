@@ -31,3 +31,11 @@ stty -F /dev/ttyACM0  2400  cs8 -cstopb -parenb -echo -icanon -onlcr
 3. semaphores and mutexes
 4. timers 
 5. event groups
+
+# debug stlink
+
+st-util -p 4500
+
+(gdb) target extended-remote localhost:4500
+
+(gdb) file rtos-template.elf
