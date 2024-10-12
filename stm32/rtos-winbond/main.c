@@ -50,7 +50,7 @@
 #define W25_CMD_ERA_32K		0x52
 #define W25_CMD_ERA_64K		0xD8
 
-#define DUMMY			0x00
+#define DUMMY			0xFF
 
 #define W25_SR1_BUSY		0x01
 #define W25_SR1_WEL		0x02
