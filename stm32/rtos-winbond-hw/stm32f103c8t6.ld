@@ -69,7 +69,6 @@ SECTIONS
 	 * Another section used by C++ stuff, appears when using newlib with
 	 * 64bit (long long) printf support
 	 */
-
 	.ARM.extab : {
 		*(.ARM.extab*)
 	} >rom
@@ -90,7 +89,7 @@ SECTIONS
 	} >ram AT >rom
 	_data_loadaddr = LOADADDR(.data);
 
-	.bss(NOLOAD) : {
+	.bss : {
 		*(.bss*)	/* Read-write zero initialized data */
 		*(COMMON)
 		. = ALIGN(4);
