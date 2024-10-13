@@ -50,7 +50,7 @@
 #define W25_CMD_ERA_32K		0x52
 #define W25_CMD_ERA_64K		0xD8
 
-#define DUMMY			0xFF
+#define DUMMY			0x00
 
 #define W25_SR1_BUSY		0x01
 #define W25_SR1_WEL		0x02
@@ -61,13 +61,21 @@ static const char *cap[3] = {
 	"W25X64"	// 16
 };	
 
+void spi_enable_test(uint32_t spi){
+	spi_set_nss_low(spi);
+}
+
+void spi_disable_test(uint32_t spi) {
+	spi_set_nss_high(spi);
+}
+
 static uint8_t
 w25_read_sr1(uint32_t spi) {
 	uint8_t sr1;
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi, W25_CMD_READ_SR1);
 	sr1 = spi_xfer(spi,DUMMY);
-	spi_disable(spi);
+	spi_disable_test(spi);
 	return sr1;
 }
 
@@ -75,10 +83,10 @@ static uint8_t
 w25_read_sr2(uint32_t spi) {
 	uint8_t sr1;
 
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,W25_CMD_READ_SR2);
 	sr1 = spi_xfer(spi,DUMMY);
-	spi_disable(spi);
+	spi_disable_test(spi);
 	return sr1;
 }
 
@@ -101,9 +109,9 @@ w25_write_en(uint32_t spi,bool en) {
 
 	w25_wait(spi);
 
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,en ? W25_CMD_WRITE_EN : W25_CMD_WRITE_DI);
-	spi_disable(spi);
+	spi_disable_test(spi);
 
 	w25_wait(spi);
 }
@@ -113,14 +121,14 @@ w25_manuf_device(uint32_t spi) {
 	uint16_t info;
 
 	w25_wait(spi);
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,W25_CMD_MANUF_DEVICE);	// Byte 1
 	spi_xfer(spi,DUMMY);			// Dummy1 (2)
 	spi_xfer(spi,DUMMY);			// Dummy2 (3)
 	spi_xfer(spi,0x00);			// Byte 4
 	info = spi_xfer(spi,DUMMY) << 8;	// Byte 5
 	info |= spi_xfer(spi,DUMMY);		// Byte 6
-	spi_disable(spi);
+	spi_disable_test(spi);
 	return info;
 }
 
@@ -129,12 +137,12 @@ w25_JEDEC_ID(uint32_t spi) {
 	uint32_t info;
 
 	w25_wait(spi);
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,W25_CMD_JEDEC_ID);
 	info = spi_xfer(spi,DUMMY);		 // Manuf.
 	info = (info << 8) | spi_xfer(spi,DUMMY);// Memory Type
 	info = (info << 8) | spi_xfer(spi,DUMMY);// Capacity
-	spi_disable(spi);
+	spi_disable_test(spi);
 
 	return info;
 }
@@ -149,13 +157,13 @@ w25_read_uid(uint32_t spi,void *buf,uint16_t bytes) {
 		return;
 
 	w25_wait(spi);
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,W25_CMD_READ_UID);
 	for ( uint8_t ux=0; ux<4; ++ux )
 		spi_xfer(spi,DUMMY);
 	for ( uint8_t ux=0; ux<bytes; ++ux )
 		udata[ux] = spi_xfer(spi,DUMMY);
-	spi_disable(spi);
+	spi_disable_test(spi);
 }
 
 static void
@@ -163,9 +171,9 @@ w25_power(uint32_t spi,bool on) {
 
 	if ( !on )
 		w25_wait(spi);
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,on ? W25_CMD_PWR_ON : W25_CMD_PWR_OFF);
-	spi_disable(spi);
+	spi_disable_test(spi);
 }
 
 static bool
@@ -176,9 +184,9 @@ w25_chip_erase(uint32_t spi) {
 		return false;
 	}
 
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,W25_CMD_CHIP_ERASE);
-	spi_disable(spi);
+	spi_disable_test(spi);
 
 	std_printf("Erasing chip..\n");
 
@@ -197,7 +205,7 @@ w25_read_data(uint32_t spi,uint32_t addr,void *data,uint32_t bytes) {
 
 	w25_wait(spi);
 
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,W25_CMD_FAST_READ);
 	spi_xfer(spi,addr >> 16);
 	spi_xfer(spi,(addr >> 8) & 0xFF);
@@ -207,7 +215,7 @@ w25_read_data(uint32_t spi,uint32_t addr,void *data,uint32_t bytes) {
 	for ( ; bytes-- > 0; ++addr )
 		*udata++ = spi_xfer(spi,DUMMY);
 
-	spi_disable(spi);
+	spi_disable_test(spi);
 	return addr;	
 }
 
@@ -224,7 +232,7 @@ w25_write_data(uint32_t spi,uint32_t addr,void *data,uint32_t bytes) {
 	}
 
 	while ( bytes > 0 ) {
-		spi_enable(spi);
+		spi_enable_test(spi);
 		spi_xfer(spi,W25_CMD_WRITE_DATA);
 		spi_xfer(spi,addr >> 16);
 		spi_xfer(spi,(addr >> 8) & 0xFF);
@@ -235,7 +243,7 @@ w25_write_data(uint32_t spi,uint32_t addr,void *data,uint32_t bytes) {
 			if ( (++addr & 0xFF) == 0x00 )
 				break;
 		}
-		spi_disable(spi);
+		spi_disable_test(spi);
 	
 		if ( bytes > 0 )
 			w25_write_en(spi,true); // More to write
@@ -269,12 +277,12 @@ w25_erase_block(uint32_t spi,uint32_t addr,uint8_t cmd) {
 		return;	// Should not happen
 	}
 
-	spi_enable(spi);
+	spi_enable_test(spi);
 	spi_xfer(spi,cmd);
 	spi_xfer(spi,addr >> 16);
 	spi_xfer(spi,(addr >> 8) & 0xFF);
 	spi_xfer(spi,addr & 0xFF);
-	spi_disable(spi);
+	spi_disable_test(spi);
 
 	std_printf("%s erased, starting at %06X\n",
 		what,(unsigned)addr);
@@ -680,38 +688,47 @@ monitor_task(void *arg __attribute((unused))) {
 
 static void
 spi_setup(void) {
-
+	
 	rcc_periph_clock_enable(RCC_SPI1);
 	gpio_set_mode(
 		GPIOA,
                 GPIO_MODE_OUTPUT_50_MHZ,
+        	GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO4		// NSS=PA4
+	);
+	gpio_set_mode(
+		GPIOA,
+                GPIO_MODE_OUTPUT_50_MHZ,
         	GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                GPIO4|GPIO5|GPIO7		// NSS=PA4,SCK=PA5,MOSI=PA7
+                GPIO5|GPIO7		// SCK=PA5,MOSI=PA7
 	);
 	gpio_set_mode(
 		GPIOA,
 		GPIO_MODE_INPUT,
-		GPIO_CNF_INPUT_FLOAT,
+		//GPIO_CNF_INPUT_FLOAT,
+		GPIO_CNF_INPUT_PULL_UPDOWN,
 		GPIO6				// MISO=PA6
 	);
 	rcc_periph_reset_pulse(RST_SPI1);
 	spi_init_master(
 		SPI1,
-                SPI_CR1_BAUDRATE_FPCLK_DIV_256,
+                SPI_CR1_BAUDRATE_FPCLK_DIV_128,
                 SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
 		SPI_CR1_CPHA_CLK_TRANSITION_1,
 	        SPI_CR1_DFF_8BIT,
 	        SPI_CR1_MSBFIRST
 	);
+	spi_set_full_duplex_mode(SPI1);
+
 	// spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
     //               SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-	spi_disable_software_slave_management(SPI1);
-	spi_enable_ss_output(SPI1);
-	// spi_enable_software_slave_management(SPI1);
-	// spi_set_nss_high(SPI1);
+	//spi_disable_software_slave_management(SPI1);
+	//spi_enable_ss_output(SPI1);
+	spi_enable_software_slave_management(SPI1);
+	spi_set_nss_high(SPI1);
 
 	/* Enable SPI1 periph. */
-	//spi_enable(SPI1);
+	spi_enable(SPI1);
 }
 
 int
@@ -738,6 +755,14 @@ main(void) {
 	uint32_t info;
 	const char *device;
 	
+	int counter = 11;
+	uint16_t rx_value = 0x42;
+	spi_send(SPI1, (uint8_t) counter);
+	/* Read the byte that just came in (use a loopback between MISO and MOSI
+		* to get the same byte back)
+		*/
+	rx_value = spi_read(SPI1);
+		
 	info = w25_manuf_device(SPI1);
 	devx = (int)(info & 0xFF)-0x14;
 	// xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
