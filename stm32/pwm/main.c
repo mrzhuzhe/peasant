@@ -51,14 +51,13 @@ void PWM_Init(void)
 
 	timer_set_period(TIM2, 20000-1);	// ARR
 	timer_set_prescaler(TIM2, 72-1); // PSC see https://github.com/ve3wwg/stm32f103c8t6/pull/12/
-	timer_set_repetition_counter(TIM2,0);	// Only needed for advanced timers:
+	//timer_set_repetition_counter(TIM2,0);	// Only needed for advanced timers:
 	timer_enable_preload(TIM2);
 	timer_continuous_mode(TIM2);
 
 	timer_disable_oc_output(TIM2,TIM_OC2);
 	timer_set_oc_mode(TIM2,TIM_OC2,TIM_OCM_PWM1);
-	timer_set_oc_polarity_high(TIM2,TIM_OC2);
-	timer_set_oc_idle_state_set(TIM1, TIM_OC1);							
+	timer_set_oc_polarity_high(TIM2,TIM_OC2);						
 
 	timer_enable_oc_output(TIM2,TIM_OC2);
 	timer_set_oc_value(TIM2,TIM_OC2, 500);	// CCR
@@ -95,11 +94,12 @@ void Servo_Init(void)
 }
 // 这段代码还涉及到一个除法和取整操作，因为角度需要被转换为PWM的占空比。
 // 使用浮点数可以更精确地执行这个转换，因为浮点数可以提供小数部分，而整数类型（如 uint16_t）只能表示整数。
-void Servo_SetAngle(float Angle)
+void Servo_SetAngle(uint16_t Angle)
 {
 	// 0     500
 	// 180   2500
-	PWM_SetCompare2(Angle / 180 * 2000 + 500);
+	//PWM_SetCompare2((uint16_t)((float)Angle / 180.f) * 2000 + 500);
+	PWM_SetCompare2(Angle*11 + 500);
 }
 
 int
@@ -107,12 +107,14 @@ main(void) {
 
 	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 
-
+	int i;
 	Servo_Init();
-	Servo_SetAngle(30);
-	
-	
-	
+
+	//timer_disable_counter(TIM2);
+	Servo_SetAngle(0);
+	//timer_enable_counter(TIM2);
+
+
 	// xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
 	// vTaskStartScheduler();
 	for (;;);
