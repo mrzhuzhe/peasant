@@ -7,7 +7,7 @@
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/spi.h>
+#include <libopencm3/stm32/timer.h>
 #include "opencm3.h"
 
 /*
@@ -28,21 +28,42 @@
 
 void PWM_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-	TIM_OCInitTypeDef TIM_OCInitStructure;
 	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	rcc_periph_clock_enable(RCC_GPIOA);	
+	rcc_periph_clock_enable(RCC_AFIO);
+	rcc_periph_clock_enable(RCC_TIM2);
 	
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	gpio_set_mode(
+		GPIOA,
+                GPIO_MODE_OUTPUT_50_MHZ,
+        	GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
+                GPIO1
+	);
 	
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	
-	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	// TIM2:
+	timer_disable_counter(TIM2);
+	rcc_periph_reset_pulse(RST_TIM2);
+
+	timer_set_mode(TIM2,
+		TIM_CR1_CKD_CK_INT,
+		TIM_CR1_CMS_EDGE,
+		TIM_CR1_DIR_UP);
+
+	timer_set_period(TIM2, 20000-1);	// ARR
+	timer_set_prescaler(TIM2, 72-1); // PSC see https://github.com/ve3wwg/stm32f103c8t6/pull/12/
+	timer_set_repetition_counter(TIM2,0);	// Only needed for advanced timers:
+	timer_enable_preload(TIM2);
+	timer_continuous_mode(TIM2);
+
+	timer_disable_oc_output(TIM2,TIM_OC2);
+	timer_set_oc_mode(TIM2,TIM_OC2,TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM2,TIM_OC2);
+	timer_set_oc_idle_state_set(TIM1, TIM_OC1);							
+
+	timer_enable_oc_output(TIM2,TIM_OC2);
+	timer_set_oc_value(TIM2,TIM_OC2, 500);	// CCR
+	timer_enable_counter(TIM2);
+
 	/*
 		因为舵机要求PWM周期为 20ms  1Hz/20ms = 1Hz / 0.02s = 50Hz
 	
@@ -56,28 +77,15 @@ void PWM_Init(void)
 		12.5% * 20ms = 2.5ms
 	
 	*/
-	TIM_TimeBaseInitStructure.TIM_Period = 20000 - 1; // ARR
-	TIM_TimeBaseInitStructure.TIM_Prescaler = 72 - 1; // PSC
-	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0; 
 	
-	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure);
-	
-	TIM_OCStructInit(&TIM_OCInitStructure); 
-	
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OCInitStructure.TIM_Pulse = 500; // CCR
-	
-	TIM_OC2Init(TIM2, &TIM_OCInitStructure);
-	
-	TIM_Cmd(TIM2, ENABLE); // 启动定时器
 }
 
 
 void PWM_SetCompare2(uint16_t Compare)
 {
-	TIM_SetCompare2(TIM2, Compare);
+	//PWM_SetCompare2(TIM2, Compare);
+	timer_set_oc_value(TIM2, TIM_OC2, Compare);
+	//timer_set_oc_value(TIM2, TIM2_CCR2, Compare);
 }
 
 
@@ -101,7 +109,7 @@ main(void) {
 
 
 	Servo_Init();
-	Servo_SetAngle(0);
+	Servo_SetAngle(30);
 	
 	
 	
