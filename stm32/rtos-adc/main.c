@@ -407,18 +407,21 @@ main(void) {
 
 	OLED_ShowChar(1, 1, 'A');
 	OLED_ShowString(1, 3, "Fuck you!");
+	OLED_ShowString(2, 1, "adc2");
+	OLED_ShowString(3, 1, "adc3");
 	
 	int adc2, adc3;
 	int i;
 	for (;;) {
 		for (i = 0; i < 5e5; i++)	/* Wait a bit. */
             __asm__("nop");
-		adc3 = read_adc(2);
+		adc2 = read_adc(2);
 		adc3 = read_adc(3);
-		OLED_ShowNum(2, 1, adc2, 5);
-		OLED_ShowNum(3, 1, adc3, 5);
+		OLED_ShowNum(2, 6, adc2, 5);
+		OLED_ShowNum(3, 6, adc3, 5);
 	}
 
+	// rtos cannot go with OLED
 	// xTaskCreate(demo_task,"monitor",500,NULL,1,NULL);
 	// vTaskStartScheduler();
 	for (;;);
