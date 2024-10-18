@@ -368,23 +368,22 @@ enum { CH2, CH3  };
 const uint8_t channel_lenght = 2;
 uint16_t channels[2];
 uint8_t chanlist[2] = { 2, 3 };
-volatile bool flag;
+// volatile bool flag;
 
-// ISR
-void dma1_channel1_isr()
-{
-	flag = true;
+// // ISR
+// void dma1_channel1_isr()
+// {
+// 	flag = true;
 
-	if (dma_get_interrupt_flag(DMA1, DMA_CHANNEL1, DMA_TCIF))
-		dma_clear_interrupt_flags(DMA1, DMA_CHANNEL1, DMA_TCIF);
-}
+// 	if (dma_get_interrupt_flag(DMA1, DMA_CHANNEL1, DMA_TCIF))
+// 		dma_clear_interrupt_flags(DMA1, DMA_CHANNEL1, DMA_TCIF);
+// }
 
 void clock_setup()
 {
 	// high-speed external oscillator (HSE) at 8MHz.
 	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 	rcc_periph_clock_enable(RCC_GPIOA); // PA6
-	rcc_periph_clock_enable(RCC_USART1);
 }
 
 void dma_setup()
@@ -434,7 +433,7 @@ void dma_setup()
 	 */
 	dma_set_number_of_data(DMA1, DMA_CHANNEL1, channel_lenght);
 
-	dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL1);
+	//dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL1);
 
 	/* Start DMA transfer. */
 	dma_enable_channel(DMA1, DMA_CHANNEL1);
@@ -474,14 +473,14 @@ void adc_setup()
 	adc_set_single_conversion_mode(ADC1);
 
 	// F1 software trigger mandatory
-	adc_enable_external_trigger_regular(ADC1, ADC_CR2_EXTSEL_SWSTART);
+	adc_enable_external_trigger_regular(ADC1, ADC_CR2_EXTSEL_SWSTART);	// Todo this is the key
 	// adc_disable_external_trigger_regular(ADC1);
 
 	/* alignment */
 	adc_set_right_aligned(ADC1);
 
 	// adc_set_sample_time(ADC1, ADC_CHANNEL6, ADC_SMPR_SMP_239DOT5CYC);
-	adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_239DOT5CYC);
+	adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_55DOT5CYC);
 
 	adc_set_regular_sequence(ADC1, channel_lenght, (uint8_t*)chanlist);
 
