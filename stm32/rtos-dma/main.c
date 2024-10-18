@@ -16,6 +16,7 @@
 https://github.com/coderwhq/learning-STM32/blob/main/8-2_DMA%E9%85%8D%E5%90%88AD%E5%A4%9A%E9%80%9A%E9%81%93/Hardware/AD.c
 https://github.com/coderwhq/learning-STM32/blob/main/7-2_AD%E5%A4%9A%E9%80%9A%E9%81%93/Hardware/AD.c
 https://github.com/ve3wwg/stm32f103c8t6/blob/master/rtos/oled_dma/main.c
+https://github.com/libopencm3/libopencm3-examples/blob/master/examples/stm32/f1/other/dma_mem2mem/dma.c
 */
 
 /*引脚初始化*/
@@ -359,9 +360,18 @@ demo_task(void *arg __attribute((unused))) {
 	}
 }
 
+// ISR
+void dma1_channel1_isr()
+{
+	if (dma_get_interrupt_flag(DMA1, DMA_CHANNEL1, DMA_TCIF))
+		dma_clear_interrupt_flags(DMA1, DMA_CHANNEL1, DMA_TCIF);
+}
+
 int
 main(void) {
 	uint16_t AD_Value[4];
+	
+	nvic_enable_irq(NVIC_DMA1_CHANNEL1_IRQ);
 
 	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 	rcc_periph_clock_enable(RCC_DMA1);
@@ -379,28 +389,40 @@ main(void) {
 	adc_power_off(ADC1);
 	rcc_peripheral_reset(&RCC_APB2RSTR,RCC_APB2RSTR_ADC1RST);
 	rcc_peripheral_clear_reset(&RCC_APB2RSTR,RCC_APB2RSTR_ADC1RST);
-	//rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);	// Set. 12MHz, Max. 14MHz
-	adc_set_dual_mode(ADC_CR1_DUALMOD_IND);		// Independent mode
-	adc_disable_scan_mode(ADC1);
+	
+	/* Prescaler */
+	rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);
+	
+	// adc_set_dual_mode(ADC_CR1_DUALMOD_IND);		// Independent mode
+	adc_enable_scan_mode(ADC1);
 	adc_set_right_aligned(ADC1);
-	adc_set_single_conversion_mode(ADC1);
-	//adc_set_sample_time(ADC1,ADC_CHANNEL_TEMP,ADC_SMPR_SMP_239DOT5CYC);
-	//adc_set_sample_time(ADC1,ADC_CHANNEL_VREF,ADC_SMPR_SMP_55DOT5CYC);
-	//adc_enable_temperature_sensor();
 
+	// adc_set_sample_time(ADC1,2,ADC_SMPR_SMP_55DOT5CYC);
+	// adc_set_sample_time(ADC1,3,ADC_SMPR_SMP_55DOT5CYC);
+	adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_55DOT5CYC);
+	uint8_t chanels[] = {2,3};
+	adc_set_regular_sequence(ADC1,2, chanels);
+	/*
+	 * After every 32bits we have to increase the address because
+	 * we use RAM.
+	 */
+	dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL1);
+	dma_disable_peripheral_increment_mode(DMA1, DMA_CHANNEL1);
 
 	dma_channel_reset(DMA1,DMA_CHANNEL1);
 	dma_set_peripheral_address(DMA1,DMA_CHANNEL1,(uint32_t)&ADC1_DR);
-	dma_set_read_from_memory(DMA1,DMA_CHANNEL1);
-	dma_set_peripheral_size(DMA1,DMA_CHANNEL1,DMA_CCR_PSIZE_8BIT);
-	dma_set_memory_size(DMA1,DMA_CHANNEL1,DMA_CCR_MSIZE_8BIT);
-	dma_set_priority(DMA1,DMA_CHANNEL1,DMA_CCR_PL_MEDIUM);
+	dma_set_peripheral_size(DMA1,DMA_CHANNEL1,DMA_CCR_PSIZE_16BIT);
 
-	dma_disable_channel(DMA1,DMA_CHANNEL1);
+	dma_set_memory_size(DMA1,DMA_CHANNEL1,DMA_CCR_MSIZE_16BIT);
+	dma_set_priority(DMA1,DMA_CHANNEL1,DMA_CCR_PL_MEDIUM);
+	dma_enable_circular_mode(DMA1,DMA_CHANNEL1);
+
+	//dma_disable_channel(DMA1,DMA_CHANNEL1);
 	dma_set_memory_address(DMA1,DMA_CHANNEL1,(uint32_t)AD_Value);
 	dma_set_number_of_data(DMA1,DMA_CHANNEL1, 4);
 	dma_enable_channel(DMA1,DMA_CHANNEL1);
 
+	adc_enable_dma(ADC1);
 
 	adc_power_on(ADC1);
 	adc_reset_calibration(ADC1);
@@ -421,8 +443,9 @@ main(void) {
 		// adc3 = read_adc(3);
 		// OLED_ShowNum(2, 6, adc2, 5);
 		// OLED_ShowNum(3, 6, adc3, 5);
-		OLED_ShowNum(2, 6, AD_Value[2], 5);
-		OLED_ShowNum(3, 6, AD_Value[3], 5);
+		adc_start_conversion_regular(ADC1);
+		OLED_ShowNum(2, 6, AD_Value[0], 5);
+		OLED_ShowNum(3, 6, AD_Value[1], 5);
 	}
 
 	// rtos cannot go with OLED
