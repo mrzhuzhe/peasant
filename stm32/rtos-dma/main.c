@@ -370,25 +370,53 @@ void dma1_channel1_isr()
 int
 main(void) {
 	uint16_t AD_Value[4];
-	
-	nvic_enable_irq(NVIC_DMA1_CHANNEL1_IRQ);
 
 	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
-	rcc_periph_clock_enable(RCC_DMA1);
+	
 
 	OLED_Init();
 
 	rcc_periph_clock_enable(RCC_GPIOA);		// Enable GPIOA for ADC
+	rcc_periph_clock_enable(RCC_ADC1);
 	gpio_set_mode(GPIOA,
 		GPIO_MODE_INPUT,
 		GPIO_CNF_INPUT_ANALOG,
 		GPIO3|GPIO2);				// PA0 & PA1
 
 	// Initialize ADC:
-	rcc_peripheral_enable_clock(&RCC_APB2ENR,RCC_APB2ENR_ADC1EN);
 	adc_power_off(ADC1);
-	rcc_peripheral_reset(&RCC_APB2RSTR,RCC_APB2RSTR_ADC1RST);
-	rcc_peripheral_clear_reset(&RCC_APB2RSTR,RCC_APB2RSTR_ADC1RST);
+
+	/*
+	 * After every 32bits we have to increase the address because
+	 * we use RAM.
+	 */
+	nvic_enable_irq(NVIC_DMA1_CHANNEL1_IRQ);
+	rcc_periph_clock_enable(RCC_DMA1);
+	
+	dma_channel_reset(DMA1,DMA_CHANNEL1);
+	
+	dma_set_priority(DMA1,DMA_CHANNEL1,DMA_CCR_PL_MEDIUM);
+
+	dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL1);
+	dma_disable_peripheral_increment_mode(DMA1, DMA_CHANNEL1);
+
+	dma_set_peripheral_address(DMA1,DMA_CHANNEL1,(uint32_t)&ADC1_DR);
+
+	dma_set_memory_size(DMA1,DMA_CHANNEL1,DMA_CCR_MSIZE_16BIT);
+	dma_set_peripheral_size(DMA1,DMA_CHANNEL1,DMA_CCR_PSIZE_16BIT);
+	
+	dma_enable_circular_mode(DMA1,DMA_CHANNEL1);
+	dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL1);
+	
+	/* We define the source as peripheral. */
+	dma_set_read_from_peripheral(DMA1, DMA_CHANNEL1);
+
+	dma_set_memory_address(DMA1,DMA_CHANNEL1,(uint32_t)AD_Value);
+	dma_set_number_of_data(DMA1,DMA_CHANNEL1, 2);
+	dma_enable_channel(DMA1,DMA_CHANNEL1);
+
+
+	rcc_periph_reset_pulse(RST_ADC1);
 	
 	/* Prescaler */
 	rcc_set_adcpre(RCC_CFGR_ADCPRE_PCLK2_DIV6);
@@ -403,28 +431,8 @@ main(void) {
 	adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_55DOT5CYC);
 	uint8_t chanels[] = {2,3};
 	adc_set_regular_sequence(ADC1,2, chanels);
-	/*
-	 * After every 32bits we have to increase the address because
-	 * we use RAM.
-	 */
-	dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL1);
-	dma_disable_peripheral_increment_mode(DMA1, DMA_CHANNEL1);
-
-	dma_channel_reset(DMA1,DMA_CHANNEL1);
-	dma_set_peripheral_address(DMA1,DMA_CHANNEL1,(uint32_t)&ADC1_DR);
-	dma_set_peripheral_size(DMA1,DMA_CHANNEL1,DMA_CCR_PSIZE_16BIT);
-
-	dma_set_memory_size(DMA1,DMA_CHANNEL1,DMA_CCR_MSIZE_16BIT);
-	dma_set_priority(DMA1,DMA_CHANNEL1,DMA_CCR_PL_MEDIUM);
-	dma_enable_circular_mode(DMA1,DMA_CHANNEL1);
-	dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL1);
-	//dma_disable_channel(DMA1,DMA_CHANNEL1);
-	dma_set_memory_address(DMA1,DMA_CHANNEL1,(uint32_t)AD_Value);
-	dma_set_number_of_data(DMA1,DMA_CHANNEL1, 4);
-	dma_enable_channel(DMA1,DMA_CHANNEL1);
-
+	
 	adc_enable_dma(ADC1);
-
 	adc_power_on(ADC1);
 	adc_reset_calibration(ADC1);
 	adc_calibrate_async(ADC1);
