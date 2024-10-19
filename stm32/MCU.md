@@ -39,3 +39,10 @@ st-util -p 4500
 (arm-none-eabi-gdb) target extended-remote localhost:4500
 
 (arm-none-eabi-gdb) file rtos-template.elf
+
+
+# Cavest
+```
+//  https://gcc.gnu.org/onlinedocs/gcc-7.3.0/gcc/Optimize-Options.html#Optimize-Options
+use -Os instend if -O0 to reduce code size or will cause stackoverflow
+```
