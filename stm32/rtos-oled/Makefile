@@ -2,7 +2,7 @@
 #  Project
 ######################################################################
 
-BINARY		= rtos-template
+BINARY		= rtos-oled
 SRCFILES	= main.c    
 SRCFILES += libs/freertos/Source/portable/MemMang/heap_4.c 
 SRCFILES += libs/freertos/Source/list.c 
