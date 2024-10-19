@@ -762,9 +762,9 @@ main(void) {
 	/* Read the byte that just came in (use a loopback between MISO and MOSI
 		* to get the same byte back)
 		*/
-	for (;;) {
-		rx_value = spi_read(SPI1);
-	}
+	// for (;;) {
+	// 	rx_value = spi_read(SPI1);
+	// }
 		
 	info = w25_manuf_device(SPI1);
 	devx = (int)(info & 0xFF)-0x14;
