@@ -1,33 +1,12 @@
-/* Demo program for OLED 128x64 SSD1306 controller
- * Warren Gay   Sun Dec 17 22:49:14 2017
- *
- * Important!  	You must have a pullup resistor on the NSS
- * 	       	line in order that the NSS (/CS) SPI output
- *		functions correctly as a chip select. The
- *		SPI peripheral configures NSS pin as an
- *		open drain output.
- *
- * OLED		4-Wire SPI
- *
- * PINS:
- *	PC13	LED
- *	PA15	/CS (NSS, with 10k pullup)
- *	PB3	SCK
- *	PB5	MOSI (MISO not used)
- *	PB10	D/C
- *	PB11	/Reset
- */
-#include <string.h>
-#include <ctype.h>
-
 #include "FreeRTOS.h"
+#include "portmacro.h"
 #include "task.h"
+#include <semphr.h>
 #include "queue.h"
 #include "OLED_Font.h"
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/spi.h>
 #include "opencm3.h"
 
 // #define OLED_W_SCL(x)		GPIO_WriteBit(GPIOB, GPIO_Pin_8, (BitAction)(x))
@@ -345,23 +324,47 @@ void OLED_Init(void)
 	OLED_Clear();				//OLED清屏
 }
 
+static SemaphoreHandle_t sem_flash = 0;
+
+void
+monitor_task(void *arg) {
+
+	for (;;) {
+		//xSemaphoreTake(sem_flash,portMAX_DELAY);
+		
+
+		// OLED_ShowChar(1, 1, 'A');
+		// OLED_ShowString(1, 3, "Fuck you!");
+		// OLED_ShowNum(2, 1, 12345, 5);
+		// OLED_ShowSignedNum(2, 7, -66, 4);
+		// OLED_ShowHexNum(3, 1, 0xAA55, 4);
+		// OLED_ShowBinNum(4, 1, 0xAA55, 16);
+		
+		gpio_toggle(GPIOC,GPIO14);
+		vTaskDelay(pdMS_TO_TICKS(500));
+
+		//xSemaphoreGive(sem_flash);
+		//vTaskDelay(pdMS_TO_TICKS(400));
+	}
+}
+
 int
 main(void) {
 
 	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 
 
-	OLED_Init();
-
-	OLED_ShowChar(1, 1, 'A');
-	OLED_ShowString(1, 3, "Fuck you!");
-	OLED_ShowNum(2, 1, 12345, 5);
-	OLED_ShowSignedNum(2, 7, -66, 4);
-	OLED_ShowHexNum(3, 1, 0xAA55, 4);
-	OLED_ShowBinNum(4, 1, 0xAA55, 16);
-	// xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
-	// vTaskStartScheduler();
+	//OLED_Init();
+	rcc_periph_clock_enable(RCC_GPIOC);
+	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO14);
+	gpio_set(GPIOC,GPIO14);
+	
+	
+	xTaskCreate(monitor_task,"monitor",100,NULL,configMAX_PRIORITIES-1,NULL);
+	vTaskStartScheduler();
+	
 	for (;;);
+
 	return 0;
 }
 
