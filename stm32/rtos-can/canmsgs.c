@@ -131,7 +131,8 @@ initialize_can(bool nart,bool locked,bool altcfg) {
                 PARM_TS1,				// segment 1 time quanta width
                 PARM_TS2,	                        // Time segment 2 time quanta width
 		PARM_BRP,				// Baud rate prescaler for 33.333 kbs
-		false,					// Loopback
+		//false,					// Loopback
+		true,					// (Notice) this is for single board test
 		false);					// Silent
 
 	can_filter_id_mask_16bit_init(
