@@ -3,6 +3,7 @@
 #include "task.h"
 #include "queue.h"
 #include "oled.h"
+#include "canmsgs.h"
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
@@ -20,8 +21,8 @@ monitor_task(void *arg) {
 		OLED_ShowHexNum(3, 1, 0xAA55, 4);
 		OLED_ShowBinNum(4, 1, 0xAA55, 16);
 		
-		gpio_toggle(GPIOC,GPIO14);
-		vTaskDelay(pdMS_TO_TICKS(500));
+		// gpio_toggle(GPIOC,GPIO14);
+		// vTaskDelay(pdMS_TO_TICKS(500));
 	}
 }
 
@@ -32,9 +33,10 @@ main(void) {
 
 
 	OLED_Init();
-	rcc_periph_clock_enable(RCC_GPIOC);
-	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO14);
-	gpio_set(GPIOC,GPIO14);
+
+	// rcc_periph_clock_enable(RCC_GPIOC);
+	// gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO14);
+	// gpio_set(GPIOC,GPIO14);
 	
 	
 	xTaskCreate(monitor_task,"monitor",100,NULL,configMAX_PRIORITIES-1,NULL);
