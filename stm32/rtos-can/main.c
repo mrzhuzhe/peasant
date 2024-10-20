@@ -1,3 +1,4 @@
+//	reffer https://www.bilibili.com/video/BV1vu4m1F7Gt?spm_id_from=333.788.videopod.episodes&vd_source=357616f412db6079b853b68278dc03db&p=8
 #include "FreeRTOS.h"
 #include "portmacro.h"
 #include "task.h"
@@ -26,7 +27,7 @@ can_recv(struct s_canmsg *msg) {
 	// OLED_ShowBinNum(3, 1, msg->data[0], 4);
 	// OLED_ShowBinNum(3, 6, msg->data[1], 4);	// seems little endian
 
-	OLED_ShowBinNum(3, 1, msgp->temp.enable, 4);
+	OLED_ShowBinNum(3, 1, msgp->temp.enable, 1);
 	OLED_ShowNum(3, 6, (unsigned)msgp->temp.reserved, 4);
 
 }
