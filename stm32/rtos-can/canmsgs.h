@@ -40,7 +40,7 @@ enum MsgID {
 
 struct s_lamp_en {
 	uint8_t		enable : 1;	// 1==on, 0==off
-	uint8_t		reserved : 4;
+	uint8_t		reserved : 8;
 };
 
 struct s_temp100 {
