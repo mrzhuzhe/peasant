@@ -104,15 +104,17 @@ initialize_can(bool nart,bool locked,bool altcfg) {
 	        gpio_set_mode(GPIOB,GPIO_MODE_INPUT,GPIO_CNF_INPUT_FLOAT,GPIO_CAN_PB_RX);
 
 	        gpio_primary_remap(                             // Map CAN1 to use PB8/PB9
-	                AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF,      // Optional
-	                AFIO_MAPR_CAN1_REMAP_PORTB);            // CAN_RX=PB8, CAN_TX=PB9
+	        //		AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF,      // Optional
+	                 AFIO_MAPR_SWJ_CFG_FULL_SWJ,
+					AFIO_MAPR_CAN1_REMAP_PORTB);            // CAN_RX=PB8, CAN_TX=PB9
 	} else	{
 	        rcc_periph_clock_enable(RCC_GPIOA);
 	        gpio_set_mode(GPIOA,GPIO_MODE_OUTPUT_50_MHZ,GPIO_CNF_OUTPUT_ALTFN_OPENDRAIN,GPIO_CAN_TX);
 	        gpio_set_mode(GPIOA,GPIO_MODE_INPUT,GPIO_CNF_INPUT_FLOAT,GPIO_CAN_RX);
 
 	        gpio_primary_remap(                             // Map CAN1 to use PA11/PA12
-	                AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF,      // Optional
+	        //        AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF,      // Optional
+			 AFIO_MAPR_SWJ_CFG_FULL_SWJ,
 			AFIO_MAPR_CAN1_REMAP_PORTA);            // CAN_RX=PA11, CAN_TX=PA12
 	}
 
