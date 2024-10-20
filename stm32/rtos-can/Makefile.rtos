@@ -1,0 +1,2 @@
+TGT_CFLAGS	+= -I./libs/freertos/include -I./include 
+TGT_CFLAGS	+= -I./libs/freertos/Source/portable/GCC/ARM_CM3/
