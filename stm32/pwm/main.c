@@ -102,12 +102,30 @@ void Servo_SetAngle(uint16_t Angle)
 	PWM_SetCompare2(Angle*11 + 500);
 }
 
+uint16_t degree = 0;
+void monitor_task(){
+	uint16_t isGPIO15On = 0;	
+	while (1){
+		isGPIO15On = gpio_get(GPIOC,GPIO15);
+		if (isGPIO15On){
+			degree += 10;
+			if (degree > 180){
+				degree = 0;
+			}
+			Servo_SetAngle(degree);
+			vTaskDelay(pdMS_TO_TICKS(500));
+		}		
+	}	
+}
+
 int
 main(void) {
 
 	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
+	rcc_periph_clock_enable(RCC_GPIOC);
+	gpio_set_mode(GPIOC,GPIO_MODE_INPUT,
+		      GPIO_CNF_INPUT_PULL_UPDOWN,GPIO15);
 
-	int i;
 	Servo_Init();
 
 	//timer_disable_counter(TIM2);
@@ -115,8 +133,8 @@ main(void) {
 	//timer_enable_counter(TIM2);
 
 
-	// xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
-	// vTaskStartScheduler();
+	xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
+	vTaskStartScheduler();
 	for (;;);
 	return 0;
 }
