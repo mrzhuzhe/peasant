@@ -25,6 +25,52 @@
 	PWM 频率	Reso = 1 / (ARR + 1)                      这个的含义需要根据结合占空比来看，这个乘上CCR就是占空比
 */
 	
+void PWM_motor_Init(void)
+{
+	//rcc_periph_clock_enable(RCC_GPIOA);	
+	
+	// gpio_set_mode(
+	// 	GPIOA,
+    //             GPIO_MODE_OUTPUT_50_MHZ,
+    //     	GPIO_CNF_OUTPUT_PUSHPULL,
+    //             GPIO11|GPIO12
+	// );
+
+	rcc_periph_clock_enable(RCC_GPIOB);	
+	rcc_periph_clock_enable(RCC_AFIO);
+	rcc_periph_clock_enable(RCC_TIM3);
+	
+	gpio_set_mode(
+		GPIOB,
+                GPIO_MODE_OUTPUT_50_MHZ,
+        	GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
+                GPIO0
+	);
+	
+	// TIM3:
+	timer_disable_counter(TIM3);
+	rcc_periph_reset_pulse(RST_TIM3);
+
+	timer_set_mode(TIM3,
+		TIM_CR1_CKD_CK_INT,
+		TIM_CR1_CMS_EDGE,
+		TIM_CR1_DIR_UP);
+
+	timer_set_period(TIM3, 100-1);	// ARR
+	timer_set_prescaler(TIM3, 32-1); // PSC s
+	//timer_set_repetition_counter(TIM3,0);	// Only needed for advanced timers:
+	timer_enable_preload(TIM3);
+	timer_continuous_mode(TIM3);
+
+	timer_disable_oc_output(TIM3,TIM_OC3);
+	timer_set_oc_mode(TIM3,TIM_OC3,TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM3,TIM_OC3);						
+
+	timer_enable_oc_output(TIM3,TIM_OC3);
+	timer_set_oc_value(TIM3,TIM_OC3, 0);	// CCR
+	timer_enable_counter(TIM3);
+
+}
 
 void PWM_Init(void)
 {
@@ -82,16 +128,24 @@ void PWM_Init(void)
 
 void PWM_SetCompare2(uint16_t Compare)
 {
-	//PWM_SetCompare2(TIM2, Compare);
 	timer_set_oc_value(TIM2, TIM_OC2, Compare);
-	//timer_set_oc_value(TIM2, TIM2_CCR2, Compare);
 }
 
+void PWM_SetCompare3(uint16_t Compare)
+{
+	timer_set_oc_value(TIM3, TIM_OC3, Compare);
+}
 
 void Servo_Init(void)
 {
 	PWM_Init();
 }
+
+void Motor_Init(void)
+{
+	PWM_motor_Init();
+}
+
 // 这段代码还涉及到一个除法和取整操作，因为角度需要被转换为PWM的占空比。
 // 使用浮点数可以更精确地执行这个转换，因为浮点数可以提供小数部分，而整数类型（如 uint16_t）只能表示整数。
 void Servo_SetAngle(uint16_t Angle)
@@ -102,17 +156,39 @@ void Servo_SetAngle(uint16_t Angle)
 	PWM_SetCompare2(Angle*11 + 500);
 }
 
+void Motor_SetSpeed(uint16_t Speed)
+{
+	if(Speed >= 0)
+	{
+		gpio_set(GPIOA, GPIO11);
+		gpio_clear(GPIOA, GPIO12);
+		PWM_SetCompare3(Speed);
+	}
+	else
+	{
+		gpio_clear(GPIOA, GPIO11);
+		gpio_set(GPIOA, GPIO12);
+		PWM_SetCompare3(-Speed);
+	}
+}
+
 uint16_t degree = 0;
+uint16_t Mspeed = 0;
 void monitor_task(){
 	uint16_t isGPIO15On = 0;	
 	while (1){
 		isGPIO15On = gpio_get(GPIOC,GPIO15);
 		if (isGPIO15On){
 			degree += 10;
+			Mspeed += 25;
 			if (degree > 180){
 				degree = 0;
 			}
+			if (Mspeed > 100) {
+				Mspeed = -100;
+			}
 			Servo_SetAngle(degree);
+			Motor_SetSpeed(Mspeed);
 			vTaskDelay(pdMS_TO_TICKS(500));
 		}		
 	}	
@@ -127,11 +203,10 @@ main(void) {
 		      GPIO_CNF_INPUT_PULL_UPDOWN,GPIO15);
 
 	Servo_Init();
+	Motor_Init();
 
-	//timer_disable_counter(TIM2);
 	Servo_SetAngle(0);
-	//timer_enable_counter(TIM2);
-
+	Motor_SetSpeed(0);
 
 	xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
 	vTaskStartScheduler();
