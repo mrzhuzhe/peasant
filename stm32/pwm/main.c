@@ -27,14 +27,6 @@
 	
 void PWM_motor_Init(void)
 {
-	//rcc_periph_clock_enable(RCC_GPIOA);	
-	
-	// gpio_set_mode(
-	// 	GPIOA,
-    //             GPIO_MODE_OUTPUT_50_MHZ,
-    //     	GPIO_CNF_OUTPUT_PUSHPULL,
-    //             GPIO11|GPIO12
-	// );
 
 	rcc_periph_clock_enable(RCC_GPIOB);	
 	rcc_periph_clock_enable(RCC_AFIO);
@@ -125,7 +117,6 @@ void PWM_Init(void)
 	
 }
 
-
 void PWM_SetCompare2(uint16_t Compare)
 {
 	timer_set_oc_value(TIM2, TIM_OC2, Compare);
@@ -143,6 +134,13 @@ void Servo_Init(void)
 
 void Motor_Init(void)
 {
+	//rcc_periph_clock_enable(RCC_GPIOA);	
+	gpio_set_mode(
+		GPIOA,
+                GPIO_MODE_OUTPUT_50_MHZ,
+        	GPIO_CNF_OUTPUT_PUSHPULL,
+                GPIO11|GPIO12
+	);
 	PWM_motor_Init();
 }
 
@@ -156,7 +154,7 @@ void Servo_SetAngle(uint16_t Angle)
 	PWM_SetCompare2(Angle*11 + 500);
 }
 
-void Motor_SetSpeed(uint16_t Speed)
+void Motor_SetSpeed(int16_t Speed)
 {
 	if(Speed >= 0)
 	{
@@ -173,7 +171,7 @@ void Motor_SetSpeed(uint16_t Speed)
 }
 
 uint16_t degree = 0;
-uint16_t Mspeed = 0;
+int16_t Mspeed = 0;
 void monitor_task(){
 	uint16_t isGPIO15On = 0;	
 	while (1){
@@ -184,8 +182,8 @@ void monitor_task(){
 			if (degree > 180){
 				degree = 0;
 			}
-			if (Mspeed > 100) {
-				Mspeed = -100;
+			if (Mspeed > 50) {
+				Mspeed = -50;
 			}
 			Servo_SetAngle(degree);
 			Motor_SetSpeed(Mspeed);
@@ -206,6 +204,13 @@ main(void) {
 	Motor_Init();
 
 	Servo_SetAngle(0);
+
+	gpio_set(GPIOA, GPIO11);
+	gpio_clear(GPIOA, GPIO12);
+
+	// gpio_clear(GPIOA, GPIO11);
+	// gpio_set(GPIOA, GPIO12);
+
 	Motor_SetSpeed(0);
 
 	xTaskCreate(monitor_task,"monitor",500,NULL,1,NULL);
