@@ -8,7 +8,7 @@
 /*引脚初始化*/
 void OLED_I2C_Init(void)
 {
-		rcc_periph_clock_enable(RCC_GPIOB);
+	rcc_periph_clock_enable(RCC_GPIOB);
 
 	// LED on PC13
 	gpio_set_mode(GPIOB,
