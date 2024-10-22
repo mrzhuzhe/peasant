@@ -12,6 +12,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include "oled.h"
 #include "mpu6050.h"
+#include "myI2C.h"
 
 // extern void vApplicationStackOverflowHook(TaskHandle_t pxTask, portCHAR *pcTaskName);
 
@@ -76,7 +77,12 @@ main(void) {
 
 	OLED_Init();
 	MPU6050_Init();
-
+	// MyI2C_Init();
+	// MyI2C_Start();
+	// MyI2C_SendByte(0xD0);
+	// uint8_t ack = MyI2C_ReceiveAck();	
+	// MyI2C_Stop();
+	// OLED_ShowNum(2, 1, ack, 5);
 	xTaskCreate(task1,"LED",100,NULL,configMAX_PRIORITIES-1,NULL);
 	vTaskStartScheduler();
 	for (;;);

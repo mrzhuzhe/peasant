@@ -18,7 +18,7 @@ void MyI2C_W_SCL(uint8_t BitValue)
     } else {
         gpio_set(GPIOB, GPIO10); 
     }
-	vTaskDelay(pdMS_TO_TICKS(10));
+	//vTaskDelay(pdMS_TO_TICKS(0.001));
 }
 
 // 写SDA
@@ -30,7 +30,7 @@ void MyI2C_W_SDA(uint8_t BitValue)
     } else {
         gpio_set(GPIOB, GPIO11); 
     }
-	vTaskDelay(pdMS_TO_TICKS(10));
+	//vTaskDelay(pdMS_TO_TICKS(0.001));
 }
 
 void MyI2C_Init(void)
@@ -50,8 +50,8 @@ void MyI2C_Init(void)
 uint8_t MyI2C_R_SDA(void)
 {
 	uint8_t BitValue;
-	BitValue = gpio_get(GPIOB, GPIO11);
-	vTaskDelay(pdMS_TO_TICKS(10));
+	BitValue = gpio_get(GPIOB, GPIO11) != 0 ? 1: 0;	// （Todo） this is weild
+	//vTaskDelay(pdMS_TO_TICKS(0.001));
 	return BitValue;
 }
 
