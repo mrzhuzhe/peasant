@@ -50,7 +50,7 @@ void MyI2C_Init(void)
 uint8_t MyI2C_R_SDA(void)
 {
 	uint8_t BitValue;
-	BitValue = gpio_get(GPIOB, GPIO11) != 0 ? 1: 0;	// （Todo） this is weild
+	BitValue = gpio_get(GPIOB, GPIO11) != 0 ? 1: 0;	// （Todo） this is weild result is  00000000 00011000
 	//vTaskDelay(pdMS_TO_TICKS(0.001));
 	return BitValue;
 }
