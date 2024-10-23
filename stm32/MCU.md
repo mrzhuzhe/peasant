@@ -46,3 +46,11 @@ st-util -p 4500
 //  https://gcc.gnu.org/onlinedocs/gcc-7.3.0/gcc/Optimize-Options.html#Optimize-Options
 use -Os instend if -O0 to reduce code size or will cause stackoverflow
 ```
+
+
+# Todos
+
+1. wifi module
+2. Battery module
+3. turn axie
+4. 4 axies helicoper
