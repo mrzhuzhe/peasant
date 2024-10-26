@@ -36,7 +36,7 @@
 // usb 连接 , 注意用这个连接时一定要拔掉电源，因为usb本身就是电源
 /stm32/rtos-usbcdc
 
-// Warnning broken dont use this
+// Warnning Not finish yet dont use this
 rtos-winbond 
 
 ```
