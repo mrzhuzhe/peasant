@@ -505,7 +505,7 @@ main(void) {
 	
 
 	OLED_ShowChar(1, 1, 'A');
-	OLED_ShowString(1, 3, "Fuck you!");
+	OLED_ShowString(1, 3, "result!");
 	OLED_ShowString(2, 1, "adc2");
 	OLED_ShowString(3, 1, "adc3");
 	
