@@ -1,97 +1,54 @@
-# Cross compile for arm cortex-M3 used in stm32
- 
-## Target
+# Linux tty setup
 ```
-export PREFIX_ARM32="$HOME/opt/cross-arm"
-export TARGET_ARM32=arm-none-eabi
-export PATH="$PREFIX_ARM32/bin:$PATH"
-```
+# show config 
+sudo stty -F /dev/ttyUSB0 -a
 
-## BINUTILS
-```
-mkdir ./binutils-build-arm32
-cd  ./binutils-build-arm32
+# baud rate to 38400, 8 bits, 1 stop bit, no parity:
+chmod 666 /dev/ttyUSB0 
+stty -F /dev/ttyUSB0 38400 cs8 -cstopb -parenb -echo -icanon -onlcr
 
-../binutils-2.43/configure --target=$TARGET_ARM32 --prefix="$PREFIX_ARM32" --with-sysroot --disable-nls --disable-werror
-make
-make install
+# USB port
+# USB cdc https://github.com/libopencm3/libopencm3-examples/tree/master/examples/stm32/f1/stm32-maple/usb_cdcacm
+chmod 666 /dev/ttyACM0 
+stty -F /dev/ttyACM0  115200  cs8 -cstopb -parenb -echo -icanon -onlcr
 
-```
 
-## GDB
-
-```
-mkdir ../gdb-build-arm32
-cd  ../gdb-build-arm32
-../gdb-15.2/configure --target=$TARGET_ARM32 --prefix="$PREFIX_ARM32" --disable-werror
-make all-gdb
-make install-gdb
-
+# USB spi
+chmod 666 /dev/ttyACM0 
+stty -F /dev/ttyACM0  2400  cs8 -cstopb -parenb -echo -icanon -onlcr
 ```
 
 
-## GCC prerequire gmp mpfr and mpc
+# Debug stlink set up
+
+st-util -p 4500
+
+(arm-none-eabi-gdb) target extended-remote localhost:4500
+
+(arm-none-eabi-gdb) file rtos-template.elf
+
+
+# Cavest
 ```
-cd ../gmp-6.3.0
-./configure
-make 
-make install 
-
-cd ../mpfr-4.2.1
-./configure
-make 
-make install 
-
-cd ../mpc-1.2.1
-./configure
-make 
-make install 
-# notice there is a bug with mpc that gcc cannot find global mpc in mpc-1.3.0
-
+//  https://gcc.gnu.org/onlinedocs/gcc-7.3.0/gcc/Optimize-Options.html#Optimize-Options
+use -Os instend if -O0 to reduce code size or will cause stackoverflow
 ```
 
+# Cortex-M3 Instruction set	
+Thumb-1, Thumb-2,
+Saturated (some), Divide
 
-## GCC
-```
-mkdir ../gcc-build-arm32
-cd ../gcc-build-arm32
-../gcc-14.2.0/configure --target=$TARGET_ARM32 --prefix="$PREFIX_ARM32" --disable-nls --enable-languages=c,c++ --without-headers
+# Major catagories in RTOS
+1. multitasking and scheduling
+    preemptive multitasking
+    cooperative multitasking (coroutines)
+2. Message queues
+3. semaphores and mutexes
+4. timers 
+5. event groups
 
-make all-gcc
-make all-target-libgcc
-
-make install-gcc
-make install-target-libgcc
-
-```
-
-# Setup libopencm3.a
-
-## NewLib
-
-```
-
-cd ../newlib-cygwin-cygwin-3.5.4/
-mkdir ../newlib-arm32-aout
-cd ../newlib-arm32-aout
-../newlib-cygwin-cygwin-3.5.4/configure --target=$TARGET_ARM32 --prefix="$PREFIX_ARM32"
-make
-make install
-
-```
-
-## libopencm3 
-
-```
-# only need make f1
-make TARGETS='stm32/f1'
-
-```
-
-## stlink
-
-```
-apt-get install libusb-1.0
-make release 
-make install
-```
+# Todos
+1. wifi module
+2. Battery module
+3. turn axie
+4. 4 axies helicoper
