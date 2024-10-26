@@ -1,7 +1,5 @@
-/* Simple LED task demo:
- *
- * The LED on PC13 is toggled in task1.
- */
+// tb6612fng
+
 #include "FreeRTOS.h"
 #include "portmacro.h"
 #include "task.h"
