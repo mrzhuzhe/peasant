@@ -22,4 +22,7 @@
     AMD Utralscale https://www.amd.com/en/products/adaptive-socs-and-fpgas/soc/zynq-ultrascale-plus-mpsoc.html
 
 12. Neuromophic computing 
-    snn
+    snn reram
+
+13. https://oscarliang.com/ fpv
+    betaflight
