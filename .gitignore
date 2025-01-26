@@ -61,3 +61,4 @@ sysroot
 stm32/**/libs
 *.elf
 *.map
+ipc/fifo/fifo_file
