@@ -60,4 +60,4 @@ make install-target-libgcc
 
 ```
 ### Issue 
-1. mawk error in gcc https://stackoverflow.com/questions/16921493/awk-illegal-reference-to-array-a
+1. mawk error in gcc https://stackoverflow.com/questions/16921493/awk-illegal-reference-to-array-a need gawk
