@@ -6,10 +6,12 @@ $ stty -F /dev/ttyUSB0 115200  cs8 -cstopb -parenb -echo
 $ cat /dev/ttyUSB0
 $ echo "AT+GMR" > /dev/ttyUSB0
 
-AT+GMR
 
-
-$ AT+CWJAP_CUR ="abc","0123456789" 
+// As station mode
+$ echo AT+CWMODE_CUR=1 > /dev/ttyUSB0
+// List all wifi ap
+$ echo AT+CWLAP > /dev/ttyUSB0
+$ echo AT+CWJAP_CUR="abc","0123456789" > /dev/ttyUSB0
 
 ```
 
