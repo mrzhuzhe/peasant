@@ -18,13 +18,24 @@ $ echo AT+CIFSR > /dev/ttyUSB0
 ```
 
 ### Server
+
 ```
 $ echo AT+CIPSTATUS > /dev/ttyUSB0
 $ echo AT+CIPMODE? > /dev/ttyUSB0
 //  $ echo AT+CIPSTART=\"UDP\" > /dev/ttyUSB0
 $ echo AT+CIPMUX=1 > /dev/ttyUSB0
 $ echo AT+CIPSERVER=1,50001 > /dev/ttyUSB0
+
 ```
+
+```
+// UDP
+$ echo AT+CIPMUX=1 > /dev/ttyUSB0
+$ echo AT+CIPSTART=\"UDP\", \"192.168.0.102\", 8080, 50002, 2 > /dev/ttyUSB0
+
+
+```
+
 
 
 ### Info 
