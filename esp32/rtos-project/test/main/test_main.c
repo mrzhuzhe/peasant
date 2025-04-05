@@ -15,7 +15,7 @@
 
 void app_main()
 {
-    printf("Hello world! fuck yo again too \n");
+    printf("Hello world! fuck yo again too 3 \n");
 
     /* Print chip information */
     esp_chip_info_t chip_info;
