@@ -5,14 +5,15 @@ Reffers:
 
 1. https://docs.ai-thinker.com/esp8266
 2. https://xuhong.blog.csdn.net/article/details/104736261
-
+3. https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-monitor.html
+4. https://docs.espressif.com/projects/esp8266-rtos-sdk/en/latest/get-started/index.html
 
 
 ### Station Mode
 
 ```
 
-$ stty -F /dev/ttyUSB0 115200  cs8 -cstopb -parenb -echo 
+$ stty -F /dev/ttyUSB0 115200  cs8 -cstopb -parenb -echo -icanon -onlcr
 $ cat /dev/ttyUSB0
 $ echo "AT+GMR" > /dev/ttyUSB0
 
