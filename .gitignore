@@ -63,3 +63,6 @@ stm32/**/libs
 *.map
 ipc/fifo/fifo_file
 outputs
+
+sdkconfig
+sdkconfig.*

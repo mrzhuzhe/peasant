@@ -1,4 +1,4 @@
-/* Hello World Example
+/* adc example
 
    This example code is in the Public Domain (or CC0 licensed, at your option.)
 
@@ -6,33 +6,50 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_spi_flash.h"
+#include "driver/adc.h"
+#include "esp_log.h"
 
+static const char *TAG = "adc example";
+
+static void adc_task()
+{
+    int x;
+    uint16_t adc_data[100];
+
+    while (1) {
+        if (ESP_OK == adc_read(&adc_data[0])) {
+            ESP_LOGI(TAG, "adc read: %d\r\n", adc_data[0]);
+        }
+
+        ESP_LOGI(TAG, "adc read fast:\r\n");
+
+        if (ESP_OK == adc_read_fast(adc_data, 100)) {
+            for (x = 0; x < 100; x++) {
+                printf("%d\n", adc_data[x]);
+            }
+        }
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
+    }
+}
 
 void app_main()
 {
-    printf("Hello world! fuck yo again too adc \n");
+    // 1. init adc
+    adc_config_t adc_config;
 
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-    printf("This is ESP8266 chip with %d CPU cores, WiFi, ",
-            chip_info.cores);
+    // Depend on menuconfig->Component config->PHY->vdd33_const value
+    // When measuring system voltage(ADC_READ_VDD_MODE), vdd33_const must be set to 255.
+    adc_config.mode = ADC_READ_TOUT_MODE;
+    adc_config.clk_div = 8; // ADC sample collection clock = 80MHz/clk_div = 10MHz
+    ESP_ERROR_CHECK(adc_init(&adc_config));
 
-    printf("silicon revision %d, ", chip_info.revision);
-
-    printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
-    for (int i = 10; i >= 0; i--) {
-        printf("Restarting in %d seconds...\n", i);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-    printf("Restarting now.\n");
-    fflush(stdout);
-    esp_restart();
+    // 2. Create a adc task to read adc value
+    xTaskCreate(adc_task, "adc_task", 1024, NULL, 5, NULL);
 }
