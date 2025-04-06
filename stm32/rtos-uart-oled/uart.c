@@ -4,6 +4,7 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/nvic.h>
 #include "oled.h"
+#include <string.h>
 
 void
 init_usart(void) {
@@ -41,6 +42,26 @@ uint16_t uart_getc() {
     return usart_recv_blocking(USART1);
 }
 
+#define BUFFER_LEN 5
+char buff[BUFFER_LEN];
+int buffer_index = 0;
+void handle_buff(uint8_t data, uint8_t len){
+	if (data == '\n') {
+		for (int i = buffer_index; i < len; i++){
+			buff[i] = ' ';
+		}
+		buffer_index = 0;
+		if (strncmp(buff, "12345", 5) == 0) {
+			OLED_ShowString(2, 1, "Bingo");
+		} else {
+			OLED_ShowString(2, 1, buff);
+		}
+	} else {
+		buff[buffer_index] = data;
+		buffer_index++;
+	}
+}
+
 void usart1_isr(void)
 {
 	static uint8_t data = 'A';
@@ -53,8 +74,8 @@ void usart1_isr(void)
 
 		/* Retrieve the data from the peripheral. */
 		data = uart_getc();
-
-        OLED_ShowChar(2, 1, (char)data);
+		//	 accumulate and handle cmd
+		handle_buff(data, BUFFER_LEN);
 
 		/* Enable transmit interrupt so it sends back the data. */
 		USART_CR1(USART1) |= USART_CR1_TXEIE;
