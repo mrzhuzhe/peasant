@@ -195,6 +195,7 @@ main(void) {
 	int adc2=0 , adc3=0;
 	int i;
 
+
 	for (;;) {
 		for (i = 0; i < 5e5; i++)	/* Wait a bit. */
             __asm__("nop");
@@ -207,7 +208,7 @@ main(void) {
 		OLED_ShowNum(3, 6, channels[CH3], 5);
 	}
 
-	// TODO rtos cannot go with DMA OLED 
+	//	TODO rtos cannot go with DMA OLED 
 	// xTaskCreate(adc_task,"adc",300,NULL,1,NULL);
 	// vTaskStartScheduler();
 	for (;;);
