@@ -171,7 +171,7 @@ adc_task() {
 		// OLED_ShowNum(2, 6, adc2, 5);
 		// OLED_ShowNum(3, 6, adc3, 5);
 		OLED_ShowString(1, 3, "fuck you!");
-		//adc_start_conversion_regular(ADC1);
+		adc_start_conversion_regular(ADC1);
 		OLED_ShowNum(2, 6, channels[CH2], 5);
 		OLED_ShowNum(3, 6, channels[CH3], 5);
 		//OLED_ShowNum(2, 6, 123, 5);
@@ -194,6 +194,7 @@ main(void) {
 		
 	int adc2=0 , adc3=0;
 	int i;
+
 	for (;;) {
 		for (i = 0; i < 5e5; i++)	/* Wait a bit. */
             __asm__("nop");
@@ -206,7 +207,7 @@ main(void) {
 		OLED_ShowNum(3, 6, channels[CH3], 5);
 	}
 
-	// rtos cannot go with OLED
+	// TODO rtos cannot go with DMA OLED 
 	// xTaskCreate(adc_task,"adc",300,NULL,1,NULL);
 	// vTaskStartScheduler();
 	for (;;);
