@@ -43,20 +43,20 @@ read_adc(uint8_t channel) {
 	return adc_read_regular(ADC1);
 }
 
-/*********************************************************************
- * Demo Task:
- *********************************************************************/
 static void
-demo_task(void *arg __attribute((unused))) {
-	int adc3;
+adc_task() {
+
+    int adc2=0, adc3=0;
+	int i=0;
 
 	for (;;) {
-		vTaskDelay(pdMS_TO_TICKS(1500));
-		OLED_ShowNum(2, 1, 123, 3);
+		for (i = 0; i < 5e5; i++)	/* Wait a bit. */
+            __asm__("nop");
+		OLED_ShowString(1, 3, "Fuck you!");
+		adc2 = read_adc(2);
 		//adc3 = read_adc(3);
-
-		//OLED_ShowNum(2, 1, adc3, 3);
-		//OLED_ShowNum(2, 1, 123, 3);
+		OLED_ShowNum(2, 6, adc2, 5);
+		//OLED_ShowNum(3, 6, adc3, 5);
 	}
 }
 
@@ -64,7 +64,6 @@ int
 main(void) {
 
 	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
-
 
 	OLED_Init();
 
@@ -93,22 +92,11 @@ main(void) {
 	OLED_ShowChar(1, 1, 'A');
 	OLED_ShowString(1, 3, "Fuck you!");
 	OLED_ShowString(2, 1, "adc2");
-	OLED_ShowString(3, 1, "adc3");
-	
-	int adc2=0, adc3=0;
-	int i;
-	for (;;) {
-		for (i = 0; i < 5e5; i++)	/* Wait a bit. */
-            __asm__("nop");
-		adc2 = read_adc(2);
-		//adc3 = read_adc(3);
-		OLED_ShowNum(2, 6, adc2, 5);
-		OLED_ShowNum(3, 6, adc3, 5);
-	}
+	//OLED_ShowString(3, 1, "adc3");
 
-	// rtos cannot go with OLED
-	// xTaskCreate(demo_task,"monitor",500,NULL,1,NULL);
-	// vTaskStartScheduler();
+	xTaskCreate(adc_task,"adc",300,NULL,1,NULL);
+	vTaskStartScheduler();
+
 	for (;;);
 	return 0;
 }

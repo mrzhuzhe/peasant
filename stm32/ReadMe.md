@@ -48,10 +48,6 @@ Saturated (some), Divide
 5. event groups
 
 # Todos
-1. wifi module esp01 
-    https://docs.ai-thinker.com/_media/esp8266/esp8266_series_modules_user_manual_en.pdf
-    https://docs.espressif.com/projects/esp-at/zh-cn/release-v2.2.0.0_esp8266/Get_Started/Hardware_connection.html
-    https://docs.ai-thinker.com/_media/esp8266/docs/esp8266_series_modules_user_manual_zh_v1.5.pdf
-2. Battery module
-3. turn axie
-4. 4 axies helicoper
+1. Battery module
+2. turn axie
+3. 4 axies helicoper
