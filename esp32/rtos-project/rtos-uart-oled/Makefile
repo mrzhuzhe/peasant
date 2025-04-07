@@ -5,6 +5,7 @@
 BINARY		= rtos-template
 SRCFILES	= main.c 
 SRCFILES += uart.c 
+SRCFILES += adc.c 
 SRCFILES += oled.c 
 SRCFILES += libs/freertos/Source/portable/MemMang/heap_4.c 
 SRCFILES += libs/freertos/Source/list.c 

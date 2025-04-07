@@ -5,6 +5,7 @@
 #include <libopencm3/cm3/nvic.h>
 #include "oled.h"
 #include <string.h>
+#include "adc.h"
 
 void
 init_usart(void) {
@@ -38,8 +39,21 @@ static inline void uart_putc(char ch) {
     usart_send_blocking(USART1, ch);
 }
 
+static inline void uart_put_str(char* str, uint16_t len) {
+    for (uint16_t i =0;i <len;i++){
+		uart_putc(str[i]);
+	}
+}
+
 uint16_t uart_getc() {
     return usart_recv_blocking(USART1);
+}
+
+void itoa(int num, char* str, int Length){
+	for (int i = 0; i < Length; i++)							
+	{
+		str[i] = (num / OLED_Pow(10, Length - i - 1) % 10 + '0');
+	}
 }
 
 #define BUFFER_LEN 5
@@ -54,10 +68,17 @@ void handle_buff(uint8_t data, uint8_t len){
 		}
 		buffer_index = 0;
 		if (strncmp(buff, "12345", 5) == 0) {
-			OLED_ShowString(2, 1, "Bingo");
+			OLED_ShowString(2, 6, "Bingo");
 		} else {
-			OLED_ShowString(2, 1, buff);
+			OLED_ShowString(2, 6, buff);
 		}
+		// read adc 2
+		int adc2 = read_adc(2);
+		const int len = 5;
+		char snum[len];
+		itoa(adc2, snum, len);
+		uart_put_str(snum, len);
+		OLED_ShowNum(3, 6, adc2, len);
 	}
 }
 
@@ -79,28 +100,22 @@ void usart1_isr(void)
 		/* Enable transmit interrupt so it sends back the data. */
 		USART_CR1(USART1) |= USART_CR1_TXEIE;
 		
-		// for (i = 0; i < delay*10; i++){ /* Wait a bit. */
-		// 	__asm__("nop");
-		// }
 		gpio_set(GPIOC,GPIO13);
 	}
 
-	/* Check if we were called because of TXE. */
-	if (((USART_CR1(USART1) & USART_CR1_TXEIE) != 0) &&
-		((USART_SR(USART1) & USART_SR_TXE) != 0)) {
-		/* Indicate that we are sending out data. */
-		gpio_clear(GPIOC, GPIO13);        
+	/* Check if we were called because of TXE. */	
+	// if (((USART_CR1(USART1) & USART_CR1_TXEIE) != 0) &&
+	// 	((USART_SR(USART1) & USART_SR_TXE) != 0)) {
+	// 	/* Indicate that we are sending out data. */
+	// 	gpio_clear(GPIOC, GPIO13);        
 
-		/* Put data into the transmit register. */
-		uart_putc(data);
+	// 	/* Put data into the transmit register. */
+	// 	uart_putc(data);		
 
-		/* Disable the TXE interrupt as we don't need it anymore. */
-		USART_CR1(USART1) &= ~USART_CR1_TXEIE;
+	// 	/* Disable the TXE interrupt as we don't need it anymore. */
+	// 	USART_CR1(USART1) &= ~USART_CR1_TXEIE;
 		
-		// for (i = 0; i < delay*10; i++){ /* Wait a bit. */
-		// 	__asm__("nop");
-		// }
-		gpio_set(GPIOC,GPIO13);
-	}
+	// 	gpio_set(GPIOC,GPIO13);
+	// }	
 	
 }

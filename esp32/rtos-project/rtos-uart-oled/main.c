@@ -12,6 +12,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include "oled.h"
 #include "uart.h"
+#include "adc.h"
 // extern void vApplicationStackOverflowHook(TaskHandle_t pxTask, portCHAR *pcTaskName);
 
 void
@@ -36,24 +37,9 @@ task_oled(void *args) {
 
 		gpio_toggle(GPIOC,GPIO14);
 		vTaskDelay(pdMS_TO_TICKS(500));
-		
-		OLED_ShowChar(1, 1, 'A');
-		OLED_ShowString(1, 3, "Fuck you!");		
-		// OLED_ShowNum(2, 1, 12345, 5);
-		// OLED_ShowSignedNum(2, 7, -66, 4);
-		// OLED_ShowHexNum(3, 1, 0xAA55, 4);
-		// OLED_ShowBinNum(4, 1, 0xAA55, 16);
-	
+
 	}
 }
-
-
-static void
-task_uart(void *args) {
-	for (;;) {		
-	}
-}
-
 
 int
 main(void) {
@@ -66,8 +52,16 @@ main(void) {
 	gpio_set(GPIOC,GPIO14);
 
 	OLED_Init();
+	
+	init_adc();
 
 	init_usart();
+
+
+	OLED_ShowChar(1, 1, 'A');
+	OLED_ShowString(1, 3, "Fuck you!");	
+	OLED_ShowString(2, 1, "q2");
+	OLED_ShowString(3, 1, "adc2");
 
 	xTaskCreate(task_oled,"LED",100,NULL,configMAX_PRIORITIES-1,NULL);
 
