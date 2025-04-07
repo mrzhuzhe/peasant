@@ -23,7 +23,27 @@
 
 #include "esp_log.h"
 
+static const char *TAG="APP";
+
 #define BUF_SIZE (1024)
+#define MSG_SIZE (16)
+
+uint8_t buffer_data[BUF_SIZE];
+uint8_t msg_data[MSG_SIZE];
+int msg_len = 0;
+static void echo_task()
+{
+    while (1) {
+        // Read data from the UART
+        int buffer_len = uart_read_bytes(UART_NUM_0, buffer_data, BUF_SIZE, 20 / portTICK_RATE_MS);        
+        if (buffer_len>0) {           
+            msg_len = buffer_len > MSG_SIZE ? MSG_SIZE : buffer_len;
+            memset(msg_data, 0, MSG_SIZE);
+            memcpy(msg_data, buffer_data, msg_len);
+        }
+    }
+}
+
 
 static void init_uart()
 {
@@ -41,7 +61,7 @@ static void init_uart()
     uart_driver_install(UART_NUM_0, BUF_SIZE * 2, 0, 0, NULL, 0);
 }
 
-static const char *TAG="APP";
+
 
 /* An HTTP GET handler */
 esp_err_t hello_get_handler(httpd_req_t *req)
@@ -112,7 +132,9 @@ esp_err_t hello_get_handler(httpd_req_t *req)
     /* Send response with custom headers and body set as the
      * string passed in user context*/
     const char* resp_str = (const char*) req->user_ctx;
-    httpd_resp_send(req, resp_str, strlen(resp_str));
+    // httpd_resp_send(req, resp_str, strlen(resp_str));
+
+    httpd_resp_send(req, (const char*)msg_data, msg_len);
 
     /* After sending the HTTP response the old HTTP request
      * headers are lost. Check if HTTP request headers can be read now. */
@@ -279,4 +301,7 @@ void app_main()
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &disconnect_handler, &server));
 
     server = start_webserver();
+
+    xTaskCreate(echo_task, "uart_echo_task", 1024, NULL, 10, NULL);
+
 }
