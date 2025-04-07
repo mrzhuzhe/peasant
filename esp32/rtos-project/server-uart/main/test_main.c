@@ -21,6 +21,7 @@
 #include <esp_http_server.h>
 #include "driver/uart.h"
 
+#include "esp_log.h"
 
 #define BUF_SIZE (1024)
 
@@ -30,6 +31,7 @@ static void init_uart()
     // communication pins and install the driver
     uart_config_t uart_config = {
         .baud_rate = 38400,
+        //.baud_rate = 74880,
         .data_bits = UART_DATA_8_BITS,
         .parity    = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
@@ -44,6 +46,8 @@ static const char *TAG="APP";
 /* An HTTP GET handler */
 esp_err_t hello_get_handler(httpd_req_t *req)
 {
+    esp_log_level_set("APP", ESP_LOG_NONE);
+
     char*  buf;
     size_t buf_len;
 
@@ -80,7 +84,7 @@ esp_err_t hello_get_handler(httpd_req_t *req)
     /* Read URL query string length and allocate memory for length + 1,
      * extra byte for null termination */
     char param[32];
-    
+
     buf_len = httpd_req_get_url_query_len(req) + 1;
     if (buf_len > 1) {
         buf = malloc(buf_len);
@@ -261,6 +265,7 @@ static void connect_handler(void* arg, esp_event_base_t event_base,
 
 void app_main()
 {
+
     init_uart();
 
     ESP_ERROR_CHECK(nvs_flash_init());

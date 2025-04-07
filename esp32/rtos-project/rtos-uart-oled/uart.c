@@ -44,10 +44,12 @@ uint16_t uart_getc() {
 
 #define BUFFER_LEN 5
 char buff[BUFFER_LEN];
-int buffer_index = 0;
+uint8_t buffer_index = 0;
 void handle_buff(uint8_t data, uint8_t len){
-	if (data == '\n') {
-		for (int i = buffer_index; i < len; i++){
+	buff[buffer_index] = data;
+	buffer_index+=1;
+	if (data == '\n' || buffer_index >= len) {
+		for (uint8_t i = buffer_index; i < len; i++){
 			buff[i] = ' ';
 		}
 		buffer_index = 0;
@@ -56,9 +58,6 @@ void handle_buff(uint8_t data, uint8_t len){
 		} else {
 			OLED_ShowString(2, 1, buff);
 		}
-	} else {
-		buff[buffer_index] = data;
-		buffer_index++;
 	}
 }
 

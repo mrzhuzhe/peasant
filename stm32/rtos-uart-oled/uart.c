@@ -46,7 +46,7 @@ uint16_t uart_getc() {
 char buff[BUFFER_LEN];
 int buffer_index = 0;
 void handle_buff(uint8_t data, uint8_t len){
-	if (data == '\n') {
+	if (data == '\n' || buffer_index >= len) {
 		for (int i = buffer_index; i < len; i++){
 			buff[i] = ' ';
 		}
