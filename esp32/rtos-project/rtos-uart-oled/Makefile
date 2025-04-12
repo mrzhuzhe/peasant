@@ -4,6 +4,7 @@
 
 BINARY		= rtos-template
 SRCFILES	= main.c 
+SRCFILES += getline.c
 SRCFILES += uart.c 
 SRCFILES += adc.c 
 SRCFILES += oled.c 

@@ -25,22 +25,6 @@ vApplicationStackOverflowHook(TaskHandle_t xTask, portCHAR *pcTaskName) {
 	};
 }
 
-static void
-task_oled(void *args) {
-	int i;
-
-	(void)args;
-
-	for (;;) {
-
-		usart1_isr();	
-
-		gpio_toggle(GPIOC,GPIO14);
-		vTaskDelay(pdMS_TO_TICKS(500));
-
-	}
-}
-
 int
 main(void) {
 
@@ -63,7 +47,7 @@ main(void) {
 	OLED_ShowString(2, 1, "q2");
 	OLED_ShowString(3, 1, "adc2");
 
-	xTaskCreate(task_oled,"LED",100,NULL,configMAX_PRIORITIES-1,NULL);
+	xTaskCreate(uart_task,"UART",100,NULL,configMAX_PRIORITIES-1,NULL);
 
 	vTaskStartScheduler();
 	for (;;);
