@@ -47,7 +47,7 @@ main(void) {
 	OLED_ShowString(2, 1, "q2");
 	OLED_ShowString(3, 1, "adc2");
 
-	xTaskCreate(uart_task,"UART",100,NULL,configMAX_PRIORITIES-1,NULL);
+	//xTaskCreate(uart_task,"UART",100,NULL,configMAX_PRIORITIES-1,NULL);
 
 	vTaskStartScheduler();
 	for (;;);

@@ -14,8 +14,8 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/nvic.h>
 
-#include <uartlib.h>
-#include <getline.h>
+#include "uart.h"
+#include "getline.h"
 
 #include "oled.h"
 #include "adc.h"
@@ -46,7 +46,7 @@ static struct s_uart_info uarts[3] = {
 	{ USART3, RCC_USART3, NVIC_USART3_IRQ, uart3_getc, uart3_putc }
 };
 
-static struct s_uart *uart_data[3] = { 0, 0, 0 };
+static struct s_uart *uart_data[3] = { NULL, NULL, NULL };
 
 /*********************************************************************
  * Receive data for USART
@@ -137,7 +137,6 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
 	infop = &uarts[ux = uartno-1];		/* USART parameters */
 	uart = infop->usart;			/* USART address */
 	usart_disable_rx_interrupt(uart);
-
 	/*************************************************************
 	 * Parity
 	 *************************************************************/
@@ -156,7 +155,6 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
 	default:
 		return -2;		// Bad parity
 	}
-
 	/*************************************************************
 	 * Stop bits
 	 *************************************************************/
@@ -199,11 +197,14 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
 	 *************************************************************/
 
 	if ( rxintf ) {
-		if ( uart_data[ux] == 0 )
+		if ( uart_data[ux] == NULL ){
 			uart_data[ux] = malloc(sizeof(struct s_uart));
-		uart_data[ux]->head = 	uart_data[ux]->tail = 0;
-	}	
-
+		}
+		//uart_data[ux]->tail = (uint16_t)0;
+		uart_data[ux]->head = (uint16_t)0;	// this line cause dead
+	}
+	
+	return 0;
 	/*************************************************************
 	 * Flow control mode:
 	 *************************************************************/
@@ -216,11 +217,9 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
 	} else if ( cts ) {
 		fc = USART_FLOWCONTROL_CTS;
 	}
-
 	/*************************************************************
 	 * Establish settings:
-	 *************************************************************/
-
+	 *************************************************************/	
 	rcc_periph_clock_enable(infop->rcc);
 	usart_set_baudrate(uart,baud);
 	usart_set_databits(uart,cfg[0]&0x0F);
@@ -490,9 +489,14 @@ uart3_write(const char *buf,unsigned bytes) {
 	write_uart(3,buf,bytes);
 }
 
+static QueueHandle_t uart_txq;				// TX queue for UART
 
 void
 init_usart(void) {
+	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
+	rcc_periph_clock_enable(RCC_GPIOA);
+	gpio_set_mode(GPIOA,GPIO_MODE_OUTPUT_50_MHZ,GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,GPIO_USART1_TX);
+	gpio_set_mode(GPIOA,GPIO_MODE_INPUT,GPIO_CNF_INPUT_FLOAT,GPIO_USART1_RX);
 
 	open_uart(1,38400,"8N1","rw",1,1);
 	uart_txq = xQueueCreate(256,sizeof(char));
@@ -504,34 +508,39 @@ uart_task(void *args) {
 	int gc;
 	char kbuf[256], ch;
 
-	puts_uart(1,"\n\ruart_task() has begun:\n\r");
+	// puts_uart(1,"\n\ruart_task() has begun:\n\r");
 
-	for (;;) {
-		if ( (gc = getc_uart_nb(1)) != -1 ) {
-			puts_uart(1,"\r\n\nENTER INPUT: ");
+	// for (;;) {
+	// 	if ( (gc = getc_uart_nb(1)) != -1 ) {
+	// 		puts_uart(1,"\r\n\nENTER INPUT: ");
 
-			ch = (char)gc;
-			if ( ch != '\r' && ch != '\n' ) {
-				/* Already received first character */
-				kbuf[0] = ch;
-				putc_uart(1,ch);
-				getline_uart(1,kbuf+1,sizeof kbuf-1);
-			} else	{
-				/* Read the entire line */
-				getline_uart(1,kbuf,sizeof kbuf);
-			}
+	// 		ch = (char)gc;
+	// 		if ( ch != '\r' && ch != '\n' ) {
+	// 			/* Already received first character */
+	// 			kbuf[0] = ch;
+	// 			putc_uart(1,ch);
+	// 			getline_uart(1,kbuf+1,sizeof kbuf-1);
+	// 		} else	{
+	// 			/* Read the entire line */
+	// 			getline_uart(1,kbuf,sizeof kbuf);
+	// 		}
 
-			puts_uart(1,"\r\nReceived input '");
-			puts_uart(1,kbuf);
-			puts_uart(1,"'\n\r\nResuming prints...\n\r");
-		}
+	// 		//puts_uart(1,"\r\nReceived input '");
+	// 		//puts_uart(1,kbuf);
+	// 		if (strncmp(kbuf, "12345", 5) == 0) {
+	// 			OLED_ShowString(2, 6, "Bingo");
+	// 		} else {
+	// 			OLED_ShowString(2, 6, kbuf);
+	// 		}
+	// 		//puts_uart(1,"'\n\r\nResuming prints...\n\r");
+	// 	}
 
-		/* Receive char to be TX */
-		if ( xQueueReceive(uart_txq,&ch,10) == pdPASS )
-			putc_uart(1,ch);
-		/* Toggle LED to show signs of life */
-		gpio_toggle(GPIOC,GPIO13);
-	}
+	// 	/* Receive char to be TX */
+	// 	if ( xQueueReceive(uart_txq,&ch,10) == pdPASS )
+	// 		putc_uart(1,ch);
+	// 	/* Toggle LED to show signs of life */
+	// 	gpio_toggle(GPIOC,GPIO13);
+	// }
 }
 
 /* End uartlib.c */

@@ -1,7 +1,7 @@
 /* Get an edited line
  * Warren W. Gay VE3WWG
  */
-#include <getline.h>
+#include "getline.h"
 
 /* If you experience memory.h does not exist, uncomment
  * the #include <string.h> instead (comment out memory.h)
