@@ -40,13 +40,9 @@ struct s_uart_info {
 	void		(*putc)(char ch);
 };
 
-static struct s_uart_info uarts[3] = {
-	{ USART1, RCC_USART1, NVIC_USART1_IRQ, uart1_getc, uart1_putc },
-	{ USART2, RCC_USART2, NVIC_USART2_IRQ, uart2_getc, uart2_putc },
-	{ USART3, RCC_USART3, NVIC_USART3_IRQ, uart3_getc, uart3_putc }
-};
+static struct s_uart_info uarts = { USART1, RCC_USART1, NVIC_USART1_IRQ, uart1_getc, uart1_putc };
 
-static struct s_uart *uart_data[3] = { NULL, NULL, NULL };
+static struct s_uart *uart_data = 0;
 
 /*********************************************************************
  * Receive data for USART
@@ -54,8 +50,8 @@ static struct s_uart *uart_data[3] = { NULL, NULL, NULL };
 
 static void
 uart_common_isr(unsigned ux) {
-	struct s_uart *uartp = uart_data[ux];			/* Access USART's buffer */
-	uint32_t uart = uarts[ux].usart;			/* Lookup USART address */
+	struct s_uart *uartp = uart_data;			/* Access USART's buffer */
+	uint32_t uart = uarts.usart;			/* Lookup USART address */
 	uint32_t ntail;						/* Next tail index */
 	char ch;						/* Read data byte */
 
@@ -81,24 +77,6 @@ uart_common_isr(unsigned ux) {
 void
 usart1_isr(void) {
 	uart_common_isr(0);
-}
-
-/*********************************************************************
- * USART2 ISR
- *********************************************************************/
-
-void
-usart2_isr(void) {
-	uart_common_isr(1);
-}
-
-/*********************************************************************
- * USART3 ISR
- *********************************************************************/
-
-void
-usart3_isr(void) {
-	uart_common_isr(2);
 }
 
 /*********************************************************************
@@ -134,7 +112,7 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
 	if ( uartno < 1 || uartno > 3 )
 		return -1;			/* Invalid UART ref */
 
-	infop = &uarts[ux = uartno-1];		/* USART parameters */
+	infop = &uarts;		/* USART parameters */
 	uart = infop->usart;			/* USART address */
 	usart_disable_rx_interrupt(uart);
 	/*************************************************************
@@ -197,14 +175,13 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
 	 *************************************************************/
 
 	if ( rxintf ) {
-		if ( uart_data[ux] == NULL ){
-			uart_data[ux] = malloc(sizeof(struct s_uart));
+		if ( uart_data == NULL ){
+			uart_data = (struct s_uart*)malloc(sizeof(struct s_uart));
 		}
-		//uart_data[ux]->tail = (uint16_t)0;
-		uart_data[ux]->head = (uint16_t)0;	// this line cause dead
+		uart_data->head = (uint16_t)0;	// this line cause dead
+		//uart_data[ux]->tail = (uint16_t)0;		
 	}
 	
-	return 0;
 	/*************************************************************
 	 * Flow control mode:
 	 *************************************************************/
@@ -244,7 +221,7 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
  *********************************************************************/
 int
 putc_uart_nb(uint32_t uartno,char ch) {
-	uint32_t uart = uarts[uartno-1].usart;
+	uint32_t uart = uarts.usart;
 
 	if ( (USART_SR(uart) & USART_SR_TXE) == 0 )
 		return -1;	/* Busy */
@@ -257,7 +234,7 @@ putc_uart_nb(uint32_t uartno,char ch) {
  *********************************************************************/
 void
 putc_uart(uint32_t uartno,char ch) {
-	uint32_t uart = uarts[uartno-1].usart;
+	uint32_t uart = uarts.usart;
 
 	while ( (USART_SR(uart) & USART_SR_TXE) == 0 )
 		taskYIELD();	
@@ -270,7 +247,7 @@ putc_uart(uint32_t uartno,char ch) {
 
 void
 write_uart(uint32_t uartno,const char *buf,uint32_t size) {
-	uint32_t uart = uarts[uartno-1].usart;
+	uint32_t uart = uarts.usart;
 
 	for ( ; size > 0; --size ) {
 		while ( (USART_SR(uart) & USART_SR_TXE) == 0 )
@@ -285,7 +262,7 @@ write_uart(uint32_t uartno,const char *buf,uint32_t size) {
 
 void
 puts_uart(uint32_t uartno,const char *buf) {
-	uint32_t uart = uarts[uartno-1].usart;
+	uint32_t uart = uarts.usart;
 
 	while ( *buf ) {
 		while ( (USART_SR(uart) & USART_SR_TXE) == 0 )
@@ -315,7 +292,7 @@ get_char(struct s_uart *uptr) {
 
 int
 getc_uart_nb(uint32_t uartno) {
-	struct s_uart *uptr = uart_data[uartno-1];
+	struct s_uart *uptr = uart_data;
 
 	if ( !uptr )
 		return -1;	// No known uart
@@ -328,7 +305,7 @@ getc_uart_nb(uint32_t uartno) {
 
 char
 getc_uart(uint32_t uartno) {
-	struct s_uart *uptr = uart_data[uartno-1];
+	struct s_uart *uptr = uart_data;
 	int rch;
 
 	if ( !uptr )
@@ -344,7 +321,7 @@ getc_uart(uint32_t uartno) {
 
 int
 getline_uart(uint32_t uartno,char *buf,uint32_t bufsiz) {
-	struct s_uart_info *uart = &uarts[uartno-1];
+	struct s_uart_info *uart = &uarts;
 
 	return getline(buf,bufsiz,uart->getc,uart->putc);
 }
@@ -355,14 +332,13 @@ getline_uart(uint32_t uartno,char *buf,uint32_t bufsiz) {
 
 void
 close_uart(uint32_t uartno) {
-	uint32_t ux = uartno - 1;
-	struct s_uart *uptr = uart_data[ux];
+	struct s_uart *uptr = uart_data;
 
-	usart_disable_rx_interrupt(uarts[ux].usart);
+	usart_disable_rx_interrupt(uarts.usart);
 
-	if ( uptr && uart_data[ux] ) {
-		free(uart_data[ux]);
-		uart_data[ux] = 0;
+	if ( uptr && uart_data ) {
+		free(uart_data);
+		uart_data = 0;
 	}
 }
 
@@ -407,92 +383,40 @@ uart1_getline(char *buf,unsigned bufsiz) {
 	return getline_uart(1,buf,bufsiz);
 }
 
-/*********************************************************************
- * Optional use routines for UART2
- *********************************************************************/
-
-void
-uart2_putc(char ch) {
-	if ( ch == '\n' )
-		putc_uart(2,'\r');
-	putc_uart(2,ch);
-}
-
-void
-uart2_puts(const char *buf) {
-	puts_uart(2,buf);
-}
-
-int
-uart2_getc(void) {
-	return getc_uart(2);
-}
-
-int
-uart2_peek(void) {
-	return getc_uart_nb(2);
-}
-
-int
-uart2_gets(char *buf,unsigned bufsiz) {
-	return getline_uart(2,buf,bufsiz);
-}
-
-void
-uart2_write(const char *buf,unsigned bytes) {
-	write_uart(2,buf,bytes);
-}
-
-int
-uart2_getline(char *buf,unsigned bufsiz) {
-	return getline_uart(2,buf,bufsiz);
-}
-
-/*********************************************************************
- * Optional use routines for UART3
- *********************************************************************/
-
-void
-uart3_putc(char ch) {
-	if ( ch == '\n' )
-		putc_uart(3,'\r');
-	putc_uart(3,ch);
-}
-
-void
-uart3_puts(const char *buf) {
-	puts_uart(3,buf);
-}
-
-int
-uart3_getc(void) {
-	return getc_uart(3);
-}
-
-int
-uart3_peek(void) {
-	return getc_uart_nb(3);
-}
-
-int
-uart3_gets(char *buf,unsigned bufsiz) {
-	return getline_uart(3,buf,bufsiz);
-}
-
-int
-uart3_getline(char *buf,unsigned bufsiz) {
-	return getline_uart(3,buf,bufsiz);
-}
-
-void
-uart3_write(const char *buf,unsigned bytes) {
-	write_uart(3,buf,bytes);
-}
 
 static QueueHandle_t uart_txq;				// TX queue for UART
 
 void
 init_usart(void) {
+
+	rcc_periph_clock_enable(RCC_GPIOA);
+	rcc_periph_clock_enable(RCC_USART1);
+
+	/* Enable the USART1 interrupt. */
+	nvic_enable_irq(NVIC_USART1_IRQ);
+
+	// GPIO_USART1_TX/GPIO13 on GPIO port A for tx
+	gpio_set_mode(GPIOA,GPIO_MODE_OUTPUT_50_MHZ,GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,GPIO_USART1_TX);	//  GPIOA10
+
+	// interrupt https://github.com/libopencm3/libopencm3-examples/blob/master/examples/stm32/f1/obldc/usart_irq/usart_irq.c
+	gpio_set_mode(GPIOA, GPIO_MODE_INPUT,GPIO_CNF_INPUT_FLOAT, GPIO_USART1_RX);	//  GPIOA9
+
+	usart_set_baudrate(USART1,38400);
+	usart_set_databits(USART1,8);
+	usart_set_stopbits(USART1,USART_STOPBITS_1);
+
+	usart_set_mode(USART1,USART_MODE_TX_RX);
+	usart_set_parity(USART1,USART_PARITY_NONE);
+	usart_set_flow_control(USART1,USART_FLOWCONTROL_NONE);
+
+	/* Enable USART1 Receive interrupt. */
+	USART_CR1(USART1) |= USART_CR1_RXNEIE;
+	;
+	usart_enable(USART1);
+}
+
+void
+init_usart2(void) {
 	rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 	rcc_periph_clock_enable(RCC_GPIOA);
 	gpio_set_mode(GPIOA,GPIO_MODE_OUTPUT_50_MHZ,GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,GPIO_USART1_TX);
@@ -502,45 +426,95 @@ init_usart(void) {
 	uart_txq = xQueueCreate(256,sizeof(char));
 }
 
+static inline void uart_putc(char ch) {
+    usart_send_blocking(USART1, ch);
+}
+
+uint16_t uart_getc() {
+    return usart_recv_blocking(USART1);
+}
+
+void uart_task(void *args)
+{
+	static uint8_t data = 'A';
+	int i = 0;
+	/* Check if we were called because of RXNE. */
+	if (((USART_CR1(USART1) & USART_CR1_RXNEIE) != 0) &&
+		((USART_SR(USART1) & USART_SR_RXNE) != 0)) {
+		/* Indicate that we got data. */
+		gpio_clear(GPIOC, GPIO13);
+
+		/* Retrieve the data from the peripheral. */
+		data = uart_getc();
+		OLED_ShowString(2, 6, "Bingo");
+
+		/* Enable transmit interrupt so it sends back the data. */
+		USART_CR1(USART1) |= USART_CR1_TXEIE;
+		
+		// for (i = 0; i < delay*10; i++){ /* Wait a bit. */
+		// 	__asm__("nop");
+		// }
+		gpio_set(GPIOC,GPIO13);
+	}
+
+	/* Check if we were called because of TXE. */
+	if (((USART_CR1(USART1) & USART_CR1_TXEIE) != 0) &&
+		((USART_SR(USART1) & USART_SR_TXE) != 0)) {
+		/* Indicate that we are sending out data. */
+		gpio_clear(GPIOC, GPIO14);
+
+		/* Put data into the transmit register. */
+		uart_putc(data);
+
+		/* Disable the TXE interrupt as we don't need it anymore. */
+		USART_CR1(USART1) &= ~USART_CR1_TXEIE;
+		
+		// for (i = 0; i < delay*10; i++){ /* Wait a bit. */
+		// 	__asm__("nop");
+		// }
+		gpio_set(GPIOC,GPIO14);
+	}
+	
+}
 
 void
-uart_task(void *args) {
+uart_task2(void *args) {
 	int gc;
 	char kbuf[256], ch;
 
-	// puts_uart(1,"\n\ruart_task() has begun:\n\r");
+	//puts_uart(1,"\n\ruart_task() has begun:\n\r");	
+	for (;;) {
+		//usart_send_blocking(uarts.usart, 'a');
+		if ( (gc = getc_uart_nb(1)) != -1 ) {
+			puts_uart(1,"\r\n\nENTER INPUT: ");
 
-	// for (;;) {
-	// 	if ( (gc = getc_uart_nb(1)) != -1 ) {
-	// 		puts_uart(1,"\r\n\nENTER INPUT: ");
+			ch = (char)gc;
+			if ( ch != '\r' && ch != '\n' ) {
+				/* Already received first character */
+				kbuf[0] = ch;
+				//putc_uart(1,ch);
+				getline_uart(1,kbuf+1,sizeof kbuf-1);
+			} else	{
+				/* Read the entire line */
+				getline_uart(1,kbuf,sizeof kbuf);
+			}
 
-	// 		ch = (char)gc;
-	// 		if ( ch != '\r' && ch != '\n' ) {
-	// 			/* Already received first character */
-	// 			kbuf[0] = ch;
-	// 			putc_uart(1,ch);
-	// 			getline_uart(1,kbuf+1,sizeof kbuf-1);
-	// 		} else	{
-	// 			/* Read the entire line */
-	// 			getline_uart(1,kbuf,sizeof kbuf);
-	// 		}
+			//puts_uart(1,"\r\nReceived input '");
+			//puts_uart(1,kbuf);
+			if (strncmp(kbuf, "12345", 5) == 0) {
+				OLED_ShowString(2, 6, "Bingo");
+			} else {
+				OLED_ShowString(2, 6, kbuf);
+			}
+			puts_uart(1,"'\n\r\nResuming prints...\n\r");
+		}
 
-	// 		//puts_uart(1,"\r\nReceived input '");
-	// 		//puts_uart(1,kbuf);
-	// 		if (strncmp(kbuf, "12345", 5) == 0) {
-	// 			OLED_ShowString(2, 6, "Bingo");
-	// 		} else {
-	// 			OLED_ShowString(2, 6, kbuf);
-	// 		}
-	// 		//puts_uart(1,"'\n\r\nResuming prints...\n\r");
-	// 	}
-
-	// 	/* Receive char to be TX */
-	// 	if ( xQueueReceive(uart_txq,&ch,10) == pdPASS )
-	// 		putc_uart(1,ch);
+		/* Receive char to be TX */
+		if ( xQueueReceive(uart_txq,&ch,10) == pdPASS )
+			putc_uart(1,ch);
 	// 	/* Toggle LED to show signs of life */
 	// 	gpio_toggle(GPIOC,GPIO13);
-	// }
+	}
 }
 
 /* End uartlib.c */
