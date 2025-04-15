@@ -38,10 +38,40 @@ struct s_uart_info {
 
 static struct s_uart_info uarts = { USART1, RCC_USART1, NVIC_USART1_IRQ, uart1_getc, uart1_putc };
 
-static struct s_uart *uart_data = 0;
+static struct s_uart uart_data = {
+	0,
+	0,
+	{ 0 }
+};
 
-int
-open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts,int cts) {
+static QueueHandle_t uart_txq;				// TX queue for UART
+
+/*********************************************************************
+ * Receive data for USART
+ *********************************************************************/
+void usart1_isr(void) {
+
+	struct s_uart *uartp = &uart_data;			/* Access USART's buffer */
+	uint32_t uart = uarts.usart;			/* Lookup USART address */
+	uint32_t ntail;						/* Next tail index */
+	char ch;						/* Read data byte */
+
+	if ( !uartp )
+		return;						/* Not open for ISR receiving! */
+
+	while ( USART_SR(uart) & USART_SR_RXNE ) {		/* Read status */
+		ch = USART_DR(uart);				/* Read data */
+		//ch = usart_recv_blocking(uart);
+		ntail = (uartp->tail + 1) % USART_BUF_DEPTH;	/* Calc next tail index */
+		/* Save data if the buffer is not full */
+		if ( ntail != uartp->head ) {			/* Not full? */
+			uartp->buf[uartp->tail] = ch;		/* No, stow into buffer */
+			uartp->tail = ntail;			/* Advance tail index */
+		}
+	}
+}
+
+int open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts,int cts) {
 	uint32_t uart, ux, stopb, iomode, parity, fc;
 	struct s_uart_info *infop;
 	bool rxintf = false;
@@ -112,11 +142,13 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
 	 *************************************************************/
 
 	if ( rxintf ) {
-		if ( uart_data == NULL ){
-			uart_data = (struct s_uart*)malloc(sizeof(struct s_uart));
-		}
-		uart_data->head = (uint16_t)0;	// this line cause dead
-		//uart_data->tail = (uint16_t)0;		
+		// if ( uart_data == NULL ){
+		// 	uart_data = (struct s_uart*)malloc(sizeof(struct s_uart));
+		// }
+		// uart_data->head = (uint16_t)0;	// this line cause dead	seem heap malloc will cause memory corruption
+		// uart_data->tail = (uint16_t)0;
+		uart_data.head = 0;
+		uart_data.tail = 0;	
 	}
 	
 	/*************************************************************
@@ -149,8 +181,7 @@ open_uart(uint32_t uartno,uint32_t baud,const char *cfg,const char *mode,int rts
 	return 0;		/* Success */
 }
 
-void
-init_usart(void) {
+void init_usart(void) {
 
 	rcc_periph_clock_enable(RCC_GPIOA);
 
@@ -161,9 +192,8 @@ init_usart(void) {
 	gpio_set_mode(GPIOA, GPIO_MODE_INPUT,GPIO_CNF_INPUT_FLOAT, GPIO_USART1_RX);	//  GPIOA9
 
 	open_uart(1,38400,"8N1","rw", 0, 0);
+	uart_txq = xQueueCreate(256,sizeof(char));
 }
-
-static QueueHandle_t uart_txq;				// TX queue for UART
 
 /*********************************************************************
  * Get cooked input line
@@ -224,7 +254,7 @@ get_char(struct s_uart *uptr) {
 
 int
 getc_uart_nb(uint32_t uartno) {
-	struct s_uart *uptr = uart_data;
+	struct s_uart *uptr = &uart_data;
 
 	if ( !uptr )
 		return -1;	// No known uart
@@ -237,7 +267,7 @@ getc_uart_nb(uint32_t uartno) {
 
 char
 getc_uart(uint32_t uartno) {
-	struct s_uart *uptr = uart_data;
+	struct s_uart *uptr = &uart_data;
 	int rch;
 
 	if ( !uptr )
@@ -263,28 +293,25 @@ void uart_task(void *args) {
 
 	//puts_uart(1,"\n\ruart_task() has begun:\n\r");	
 	for (;;) {
-		usart_send_blocking(uarts.usart, getc_uart_nb(1));
+		//usart_send_blocking(uarts.usart, 'a');
+		usart1_isr();
 		if ( (gc = getc_uart_nb(1)) != -1 ) {
+			//usart_send_blocking(uarts.usart, gc);
 			puts_uart(1,"\r\n\nENTER INPUT: ");
 
 			ch = (char)gc;
 			if ( ch != '\r' && ch != '\n' ) {
 				/* Already received first character */
 				kbuf[0] = ch;
-				//putc_uart(1,ch);
-				getline_uart(1,kbuf+1,sizeof kbuf-1);
+				putc_uart(1,ch);
+				//getline_uart(1,kbuf+1,sizeof kbuf-1);
 			} else	{
 				/* Read the entire line */
-				getline_uart(1,kbuf,sizeof kbuf);
+				//getline_uart(1,kbuf,sizeof kbuf);
 			}
 
-			//puts_uart(1,"\r\nReceived input '");
-			//puts_uart(1,kbuf);
-			if (strncmp(kbuf, "12345", 5) == 0) {
-				OLED_ShowString(2, 6, "Bingo");
-			} else {
-				OLED_ShowString(2, 6, kbuf);
-			}
+			puts_uart(1,"\r\nReceived input '");
+			puts_uart(1,kbuf);
 			puts_uart(1,"'\n\r\nResuming prints...\n\r");
 		}
 
