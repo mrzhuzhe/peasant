@@ -1,3 +1,4 @@
+//	https://stackoverflow.com/questions/14509662/performance-difference-between-ipc-shared-memory-and-threads-memory
 #include <stdio.h>
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -36,7 +37,8 @@ int main(int argc, char *argv[])
 	// place data into memory
 	memcpy(data, addr, STORAGE_SIZE);
 
-	printf("PID %d: Read from shared memory: \"%s\"\n", pid, data);
+	//printf("PID %d: Read from shared memory: \"%s\"\n", pid, data);
+	printf("PID %d: Read from shared memory: \"%s\"\n", pid, (char*)addr);
 
 	return 0;
 }
