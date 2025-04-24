@@ -3,6 +3,6 @@
 #include <stdio.h>
 
 int main(){
-    printf("test \n");
+    printf("test stm32 hal\n");
     return 0;    
 }
