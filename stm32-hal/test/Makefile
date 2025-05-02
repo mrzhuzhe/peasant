@@ -1,12 +1,14 @@
-CFLAGS = 
-LDFLAGS = 
+######################################################################
+#  Project
+######################################################################
 
-test_main:
-	$(CC) $(CFLAGS) -o outputs/test.o main.c $(LDFLAGS) 
+BINARY		= miniblink
+SRCFILES	= main.c
+SRCFILES	+= stm32f1xx_hal_gpio.c
+SRCFILES	+= stm32f1xx_hal_rcc.c
 
-.PHONY: test clean
+all: elf bin
 
-test:	
+include ./Makefile.incl
 
-clean:
-	rm -f *.o rm -f outputs/*.o
+# End
