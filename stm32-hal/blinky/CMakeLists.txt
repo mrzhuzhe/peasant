@@ -41,7 +41,7 @@ target_link_libraries(${TARGET_NAME}
     HAL::STM32::F1::RCC
     HAL::STM32::F1::GPIO
     HAL::STM32::F1::CORTEX
-    CMSIS::STM32::F100RB
+    CMSIS::STM32::F103C8
     STM32::NoSys
 )
 
