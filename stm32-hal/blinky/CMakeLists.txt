@@ -33,11 +33,11 @@ find_package(HAL COMPONENTS "${HAL_COMP_LIST}" REQUIRED)
 # Find everything:
 #find_package(HAL REQUIRED)
 
-# STM32F4-Discovery
+set(TARGET_NAME stm32-blinky-f1)
 
-# STM32VL-Discovery
-add_executable(stm32-blinky-f1 ${MAIN_SOURCE_FILE} stm32f1xx_hal_conf.h)
-target_link_libraries(stm32-blinky-f1
+
+add_executable(${TARGET_NAME} ${MAIN_SOURCE_FILE} stm32f1xx_hal_conf.h)
+target_link_libraries(${TARGET_NAME}
     HAL::STM32::F1::RCC
     HAL::STM32::F1::GPIO
     HAL::STM32::F1::CORTEX
@@ -46,5 +46,5 @@ target_link_libraries(stm32-blinky-f1
 )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
-
-stm32_print_size_of_target(stm32-blinky-f1)
+stm32_generate_binary_file(${TARGET_NAME})
+stm32_print_size_of_target(${TARGET_NAME})
