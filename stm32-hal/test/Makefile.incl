@@ -6,7 +6,8 @@ PREFIX		?= arm-none-eabi
 
 TOP_DIR 	:= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 STM32HAL_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/inc)
-STM32CMISS_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Include)
+STM32CMISS_CORE_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Include)
+STM32CMISS_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Device/ST/STM32F1xx)
 
 DEFS		+= -DSTM32F1
 
@@ -42,6 +43,7 @@ TGT_CFLAGS	+= -Wextra -Wshadow -Wimplicit-function-declaration
 TGT_CFLAGS	+= -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes
 TGT_CFLAGS	+= -fno-common -ffunction-sections -fdata-sections
 TGT_CFLAGS	+= -I$(STM32CMISS_DIR)
+TGT_CFLAGS	+= -I$(STM32CMISS_CORE_DIR)
 TGT_CFLAGS	+= -I$(STM32HAL_DIR)
 
 
