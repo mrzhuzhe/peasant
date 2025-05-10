@@ -5,9 +5,9 @@
 PREFIX		?= arm-none-eabi
 
 TOP_DIR 	:= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-STM32HAL_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/inc)
+STM32HAL_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/hal/inc)
 STM32CMISS_CORE_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Include)
-STM32CMISS_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Device/ST/STM32F1xx)
+STM32CMISS_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Device/ST/STM32F1xx/Include)
 
 DEFS		+= -DSTM32F1
 
