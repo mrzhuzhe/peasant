@@ -32,10 +32,10 @@ OPT		:= -Os -g
 CSTD		?= -std=c99
 
 TEMP1 		= $(patsubst %.c,%.o,$(SRCFILES))
-TEMP2		= $(patsubst %.asm,%.o,$(TEMP1))
+TEMP2		= $(patsubst %.s,%.o,$(TEMP1))
 OBJS 		= $(patsubst %.cpp,%.o,$(TEMP2))
 
-LDSCRIPT	?= $(TOP_DIR)/stm32f103c8t6.ld
+LDSCRIPT	?= $(TOP_DIR)/F103C8.ld
 
 TGT_CFLAGS	+= $(OPT) $(CSTD)
 TGT_CFLAGS	+= $(ARCH_FLAGS)
@@ -63,7 +63,8 @@ TGT_LDFLAGS	+= -Wl,-Map=$(*).map
 TGT_LDFLAGS	+= -Wl,--gc-sections
 
 LDLIBS		+= -specs=nosys.specs
-LDLIBS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
+#LDLIBS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
+LDLIBS		+= -Wl,--start-group -lnosys -Wl,--end-group
 
 .SUFFIXES:	.elf .bin .hex .srec .list .map .images
 .SECONDEXPANSION:
@@ -117,7 +118,7 @@ print-%:
 	@#printf "  CXX     $(*).cpp\n"
 	$(CXX) $(TGT_CXXFLAGS) $(CXXFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).cpp
 
-%.o: %.asm
+%.o: %.s
 	$(AS) $(ASFLAGS) -o $*.o -c $<
 
 clean:
