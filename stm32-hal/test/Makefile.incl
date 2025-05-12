@@ -1,35 +1,24 @@
-######################################################################
-#  Rules etc. adapted from libopencm3
-######################################################################
-
 PREFIX		?= arm-none-eabi
 
 TOP_DIR 	:= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-STM32HAL_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/hal/inc)
-STM32CMISS_CORE_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Include)
-STM32CMISS_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Device/ST/STM32F1xx/Include)
+STM32_HAL_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/hal/inc)
+STM32_CMISS_CORE_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Include)
+STM32_CMISS_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Device/ST/STM32F1xx/Include)
 
 DEFS		+= -DSTM32F1
 
-FP_FLAGS	?= -msoft-float
-ARCH_FLAGS	= -mthumb -mcpu=cortex-m3 $(FP_FLAGS) -mfix-cortex-m3-ldrd
+ARCH_FLAGS	= -mthumb -mcpu=cortex-m3
 ASFLAGS		= -mthumb -mcpu=cortex-m3
 
 CC		:= $(PREFIX)-gcc
-CXX		:= $(PREFIX)-g++
-LD		:= $(PREFIX)-gcc
-AR		:= $(PREFIX)-ar
+LD		:= $(CC)
 AS		:= $(PREFIX)-as
 OBJCOPY		:= $(PREFIX)-objcopy
 SIZE		:= $(PREFIX)-size
 OBJDUMP		:= $(PREFIX)-objdump
-GDB		:= $(PREFIX)-gdb
 STFLASH		= $(shell which st-flash)
-STYLECHECK	:= /checkpatch.pl
-STYLECHECKFLAGS	:= --no-tree -f --terse --mailback
-STYLECHECKFILES	:= $(shell find . -name '*.[ch]')
+
 OPT		:= -Os -g
-CSTD		?= -std=c99
 
 TEMP1 		= $(patsubst %.c,%.o,$(SRCFILES))
 TEMP2		= $(patsubst %.s,%.o,$(TEMP1))
@@ -37,34 +26,24 @@ OBJS 		= $(patsubst %.cpp,%.o,$(TEMP2))
 
 LDSCRIPT	?= $(TOP_DIR)/F103C8.ld
 
-TGT_CFLAGS	+= $(OPT) $(CSTD)
+TGT_CFLAGS	+= $(OPT)
 TGT_CFLAGS	+= $(ARCH_FLAGS)
-TGT_CFLAGS	+= -Wextra -Wshadow -Wimplicit-function-declaration
-TGT_CFLAGS	+= -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes
-TGT_CFLAGS	+= -fno-common -ffunction-sections -fdata-sections
-TGT_CFLAGS	+= -I$(STM32CMISS_DIR)
-TGT_CFLAGS	+= -I$(STM32CMISS_CORE_DIR)
-TGT_CFLAGS	+= -I$(STM32HAL_DIR)
+TGT_CFLAGS	+= -ffunction-sections -fdata-sections
+TGT_CFLAGS	+= $(DEFS)
 
+TGT_CFLAGS	+= -I$(STM32_CMISS_DIR)
+TGT_CFLAGS	+= -I$(STM32_CMISS_CORE_DIR)
+TGT_CFLAGS	+= -I$(STM32_HAL_DIR)
 
-TGT_CXXFLAGS	+= $(OPT) $(CXXSTD)
-TGT_CXXFLAGS	+= $(ARCH_FLAGS)
-TGT_CXXFLAGS	+= -Wextra -Wshadow -Wredundant-decls  -Weffc++
-TGT_CXXFLAGS	+= -fno-common -ffunction-sections -fdata-sections
-
-TGT_CPPFLAGS	+= -MD
-TGT_CPPFLAGS	+= -Wall -Wundef
-TGT_CPPFLAGS	+= $(DEFS)
 
 # todo undefined reference to `_init'
 #TGT_LDFLAGS	+= --static -nostartfiles
 TGT_LDFLAGS	+= -T$(LDSCRIPT)
 TGT_LDFLAGS	+= $(ARCH_FLAGS)
-TGT_LDFLAGS	+= -Wl,-Map=$(*).map
+#TGT_LDFLAGS	+= -Wl,-Map=$(*).map	# todo delete
 TGT_LDFLAGS	+= -Wl,--gc-sections
 
 LDLIBS		+= -specs=nosys.specs
-LDLIBS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 
 .SUFFIXES:	.elf .bin .hex .srec .list .map .images
 .SECONDEXPANSION:
@@ -108,15 +87,7 @@ print-%:
 
 %.o: %.c
 	@#printf "  CC      $(*).c\n"
-	$(CC) $(TGT_CFLAGS) $(CFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).c
-
-%.o: %.cxx
-	@#printf "  CXX     $(*).cxx\n"
-	$(CXX) $(TGT_CXXFLAGS) $(CXXFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).cxx
-
-%.o: %.cpp
-	@#printf "  CXX     $(*).cpp\n"
-	$(CXX) $(TGT_CXXFLAGS) $(CXXFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).cpp
+	$(CC) $(TGT_CFLAGS) $(CFLAGS) -o $(*).o -c $(*).c
 
 %.o: %.s
 	$(AS) $(ASFLAGS) -o $*.o -c $<
