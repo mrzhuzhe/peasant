@@ -1,9 +1,9 @@
 PREFIX		?= arm-none-eabi
 
 TOP_DIR 	:= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-STM32_HAL_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/hal/inc)
-STM32_CMISS_CORE_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Include)
-STM32_CMISS_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/cmiss/Device/ST/STM32F1xx/Include)
+STM32_HAL_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/Hal/Inc)
+STM32_CMISS_CORE_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/Cmiss/Include)
+STM32_CMISS_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/Cmiss/Device/ST/STM32F1xx/Include)
 
 DEFS		+= -DSTM32F1
 
@@ -40,7 +40,6 @@ TGT_CFLAGS	+= -I$(STM32_HAL_DIR)
 #TGT_LDFLAGS	+= --static -nostartfiles
 TGT_LDFLAGS	+= -T$(LDSCRIPT)
 TGT_LDFLAGS	+= $(ARCH_FLAGS)
-#TGT_LDFLAGS	+= -Wl,-Map=$(*).map	# todo delete
 TGT_LDFLAGS	+= -Wl,--gc-sections
 
 LDLIBS		+= -specs=nosys.specs
