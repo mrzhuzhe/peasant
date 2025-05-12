@@ -4,6 +4,7 @@
 
 BINARY		= miniblink
 SRCFILES	= main.c
+SRCFILES	+= stm32f1xx_hal.c
 SRCFILES	+= stm32f1xx_hal_gpio.c
 SRCFILES	+= stm32f1xx_hal_rcc.c
 SRCFILES	+= stm32f1xx_hal_flash.c
