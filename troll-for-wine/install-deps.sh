@@ -29,3 +29,11 @@ apt install libosmesa6-dev  # OpenGL bitmap support
 apt install libsdl2-dev # Generally necessary for joystick or other HID support. Only one library is necessary, but they may exhibit different behaviour.
 apt install libudev-dev # systemd
 apt install libvulkan-dev   
+
+
+cd ../wine32-build/
+PKG_CONFIG_PATH=/usr/lib32 ../configure --with-wine64=../wine64-build
+make -j12
+
+
+# but wine seem to detect GPU wrong 
