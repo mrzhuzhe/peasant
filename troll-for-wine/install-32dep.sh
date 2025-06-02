@@ -15,4 +15,4 @@ apt install libdbus-1-dev:i386
 apt install libudev-dev:i386
 
 apt install libgstreamer1.0-dev:i386
-apt install libgstreamer-plugins-base1.0-dev:i386
+# apt install libgstreamer-plugins-base1.0-dev:i386 broken not this one 
