@@ -31,8 +31,8 @@ apt install libudev-dev # systemd
 apt install libvulkan-dev   
 
 
-cd ../wine32-build/
-PKG_CONFIG_PATH=/usr/lib32 ../configure --with-wine64=../wine64-build
+../configure --enable-win64 CFLAGS="-O3" CROSSCFLAGS="-O3"
+PKG_CONFIG_PATH=/usr/lib32 ../configure --with-wine64=../wine64-build CFLAGS="-O3" CROSSCFLAGS="-O3"
 make -j12
 
 
