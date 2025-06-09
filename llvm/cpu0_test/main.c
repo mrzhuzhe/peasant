@@ -1,8 +1,8 @@
 /*
     CC = llvm-g++ -stdlib=libc++ -std=c++14
     CC = clang++ -stdlib=libstdc++ -std=c++14
-    seems lllvm-project not compile libc++ yet
-
+    1. seems lllvm-project not compile libc++ yet
+    2. seems no lld, gcc ld need specific llvm libs 
 */
   
 
