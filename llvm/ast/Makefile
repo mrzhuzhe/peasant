@@ -8,8 +8,8 @@ CC = clang++ -stdlib=libstdc++ -std=c++14
 CFLAGS = -g -I llvm/include -I llvm/build/include -I ./ 
 LLVMFLAGS = `llvm-config --cxxflags --ldflags --system-libs --libs all`
 
-LINKFLAG = -L/mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/llvm-project/build/lib \
--lLLVMWindowsManifest \
+LINKFLAG = -L/mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/llvm-project/build/lib
+LDLIBS = -lLLVMWindowsManifest \
 -lLLVMXRay \
 -lLLVMLibDriver \
 -lLLVMDlltoolDriver \
@@ -183,19 +183,19 @@ LINKFLAG = -L/mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/llvm-project/build/l
 -lLLVMTableGen \
 -lLLVMSupport \
 -lLLVMDemangle \
--lrt \
--ldl \
--lpthread \
--lm \
--lz \
--lzstd \
--lxml2 
+# -lrt \
+# -ldl \
+# -lpthread \
+# -lm \
+# -lz \
+# -lzstd \
+# -lxml2 
 
 .PHONY: main
 
 main: main.cpp ${OBJ}
-	${CC} ${CFLAGS} ${LLVMFLAGS} ${OBJ} $< -o $@.o ${LINKFLAG}
-
+	${CC} ${CFLAGS} ${LLVMFLAGS} ${OBJ} $< -o $@.o  ${LDLIBS}
+#${LINKFLAG}
 clean:
 	rm -r ${OBJ}
 
