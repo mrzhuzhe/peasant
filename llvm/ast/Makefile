@@ -8,7 +8,7 @@ CC = clang++ -stdlib=libstdc++ -std=c++14
 CFLAGS = -g -I llvm/include -I llvm/build/include -I ./ 
 LLVMFLAGS = `llvm-config --cxxflags --ldflags --system-libs --libs all`
 
-LINKFLAG = -L/mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/llvm-project/build/lib
+LINKDIR= -L/mnt/e28833eb-0c99-4fe2-802a-09fa58d9c9f5/code/llvm-project/build/lib
 LDLIBS = -lLLVMWindowsManifest \
 -lLLVMXRay \
 -lLLVMLibDriver \
