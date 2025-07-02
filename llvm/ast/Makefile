@@ -1,5 +1,5 @@
-SOURCES = $(shell find ast kaleidoscope lexer logger parser -name '*.cpp')
-HEADERS = $(shell find ast kaleidoscope lexer logger parser -name '*.h')
+SOURCES = $(shell find ast kaleidoscope lexer logger parser passes -name '*.cpp')
+HEADERS = $(shell find ast kaleidoscope lexer logger parser passes -name '*.h')
 OBJ = ${SOURCES:.cpp=.o}
 
 #CC = llvm-g++ -stdlib=libc++ -std=c++14

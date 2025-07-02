@@ -33,6 +33,9 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
 
+#include "llvm/Support/TargetSelect.h"
+#include "passes/pass.h"
+
 // stdlib headers
 #include <algorithm>
 #include <cctype>
@@ -118,6 +121,8 @@ int main() {
   getNextToken();
 
   TheModule = std::make_unique<Module>("My awesome JIT", TheContext);
+
+  InitializeModuleAndManagers();
 
   MainLoop();
 
