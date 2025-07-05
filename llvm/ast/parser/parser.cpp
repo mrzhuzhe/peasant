@@ -154,7 +154,7 @@ std::unique_ptr<PrototypeAST> ParsePrototype() {
 
 std::unique_ptr<FunctionAST> ParseDefinition() {
   getNextToken();
-
+  // function definition
   auto Proto = ParsePrototype();
   if (!Proto) {
     return nullptr;

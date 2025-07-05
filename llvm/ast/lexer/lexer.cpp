@@ -37,6 +37,8 @@ int gettok() {
     return tok_identifier;
   }
 
+  // type and oop may be inplement here
+
   // Stacking together only numeric values
   if (isdigit(LastChar) || LastChar == '.') {
     std::string NumStr;

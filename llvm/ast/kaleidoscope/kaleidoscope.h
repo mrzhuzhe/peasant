@@ -27,17 +27,15 @@ extern std::unique_ptr<llvm::Module> TheModule;
 // This map keeps track of which values are defined in the current scope
 extern std::map<std::string, llvm::Value *> NamedValues;
 
-
-extern std::map<std::string, Value *> NamedValues;
 extern std::unique_ptr<KaleidoscopeJIT> TheJIT;
 extern std::unique_ptr<FunctionPassManager> TheFPM;
-extern std::unique_ptr<LoopAnalysisManager> TheLAM;
-extern std::unique_ptr<FunctionAnalysisManager> TheFAM;
-extern std::unique_ptr<CGSCCAnalysisManager> TheCGAM;
-extern std::unique_ptr<ModuleAnalysisManager> TheMAM;
-extern std::unique_ptr<PassInstrumentationCallbacks> ThePIC;
-extern std::unique_ptr<StandardInstrumentations> TheSI;
+// extern std::unique_ptr<LoopAnalysisManager> TheLAM;
+// extern std::unique_ptr<FunctionAnalysisManager> TheFAM;
+// extern std::unique_ptr<CGSCCAnalysisManager> TheCGAM;
+// extern std::unique_ptr<ModuleAnalysisManager> TheMAM;
+// extern std::unique_ptr<PassInstrumentationCallbacks> ThePIC;
+// extern std::unique_ptr<StandardInstrumentations> TheSI;
 extern std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
-// extern ExitOnError ExitOnErr;
+extern ExitOnError ExitOnErr;
 
 #endif
