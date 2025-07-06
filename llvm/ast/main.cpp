@@ -58,7 +58,7 @@ static void HandleDefinition() {
       fprintf(stderr, "\n");
       // ExitOnErr(TheJIT->addModule(
       //     ThreadSafeModule(std::move(TheModule), std::move(TheContext))));
-      InitializeModuleAndPassManagers();
+      // InitializeModuleAndPassManagers();
     }
   } else {
     getNextToken();
@@ -88,7 +88,7 @@ static void HandleTopLevelExpression() {
 
       // auto TSM = ThreadSafeModule(std::move(TheModule), std::move(TheContext));
       // ExitOnErr(TheJIT->addModule(std::move(TSM), RT));
-      InitializeModuleAndPassManagers();
+      // InitializeModuleAndPassManagers();
 
        // Search the JIT for the __anon_expr symbol.
       // auto ExprSymbol = ExitOnErr(TheJIT->lookup("__anon_expr"));
