@@ -146,7 +146,6 @@ int main() {
   fprintf(stderr, "ready> ");
   getNextToken();
 
-  TheModule = std::make_unique<Module>("My awesome JIT", *TheContext);
   //TheJIT = ExitOnErr(KaleidoscopeJIT::Create());
 
   InitializeModuleAndPassManagers();
