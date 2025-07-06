@@ -46,6 +46,8 @@
 #include <string>
 #include <vector>
 
+#include "llvm/ExecutionEngine/Orc/ExecutionUtils.h"
+
 using namespace llvm;
 
 static void HandleDefinition() {
@@ -54,6 +56,9 @@ static void HandleDefinition() {
       fprintf(stderr, "Read function definition:");
       FnIR->print(errs());
       fprintf(stderr, "\n");
+      // ExitOnErr(TheJIT->addModule(
+      //     ThreadSafeModule(std::move(TheModule), std::move(TheContext))));
+      InitializeModuleAndPassManagers();
     }
   } else {
     getNextToken();
@@ -66,6 +71,7 @@ static void HandleExtern() {
       fprintf(stderr, "Read extern:");
       FnIR->print(errs());
       fprintf(stderr, "\n");
+      //FunctionProtos[ProtoAST->getName()] = std::move(ProtoAST);
     }
   } else {
     getNextToken();
@@ -75,6 +81,26 @@ static void HandleExtern() {
 static void HandleTopLevelExpression() {
   if (auto FnAST = ParseTopLevelExpr()) {
     if (auto *FnIR = FnAST->codegen()) {
+
+      // Create a ResourceTracker to track JIT'd memory allocated to our
+      // anonymous expression -- that way we can free it after executing.
+      // auto RT = TheJIT->getMainJITDylib().createResourceTracker();
+
+      // auto TSM = ThreadSafeModule(std::move(TheModule), std::move(TheContext));
+      // ExitOnErr(TheJIT->addModule(std::move(TSM), RT));
+      InitializeModuleAndPassManagers();
+
+       // Search the JIT for the __anon_expr symbol.
+      // auto ExprSymbol = ExitOnErr(TheJIT->lookup("__anon_expr"));
+
+      // // Get the symbol's address and cast it to the right type (takes no
+      // // arguments, returns a double) so we can call it as a native function.
+      // double (*FP)() = (double (*)())(intptr_t)ExprSymbol.getAddress();
+      // fprintf(stderr, "Evaluated to %f\n", FP());
+
+      // Delete the anonymous expression module from the JIT.
+      // ExitOnErr(RT->remove());
+
       fprintf(stderr, "Read top-level expression:");
       FnIR->print(errs());
       fprintf(stderr, "\n");
@@ -120,9 +146,10 @@ int main() {
   fprintf(stderr, "ready> ");
   getNextToken();
 
-  TheModule = std::make_unique<Module>("My awesome JIT", TheContext);
+  TheModule = std::make_unique<Module>("My awesome JIT", *TheContext);
+  //TheJIT = ExitOnErr(KaleidoscopeJIT::Create());
 
-  InitializeModuleAndManagers();
+  InitializeModuleAndPassManagers();
 
   MainLoop();
 

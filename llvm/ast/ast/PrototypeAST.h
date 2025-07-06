@@ -4,6 +4,7 @@
 #include "ast/ExprAST.h"
 #include "llvm/IR/IRBuilder.h"
 #include "kaleidoscope/kaleidoscope.h"
+#include <map>
 
 // Represents the "prototype" for a function,
 // which captures its name, and its argument names
@@ -17,5 +18,7 @@ public:
   llvm::Function *codegen();
   const std::string &getName() const { return Name; }
 };
+
+extern std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
 
 #endif
