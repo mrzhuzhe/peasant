@@ -54,11 +54,12 @@ static void HandleDefinition() {
   if (auto FnAST = ParseDefinition()) {
     if (auto *FnIR = FnAST->codegen()) {
       fprintf(stderr, "Read function definition:");
-      FnIR->print(errs());
+      //FnIR->print(errs());
+      FnIR->print(outs());
       fprintf(stderr, "\n");
-      // ExitOnErr(TheJIT->addModule(
-      //     ThreadSafeModule(std::move(TheModule), std::move(TheContext))));
-      // InitializeModuleAndPassManagers();
+      ExitOnErr(TheJIT->addModule(
+          llvm::orc::ThreadSafeModule(std::move(TheModule), std::move(TheContext))));
+      InitializeModuleAndPassManagers();
     }
   } else {
     getNextToken();
@@ -84,22 +85,22 @@ static void HandleTopLevelExpression() {
 
       // Create a ResourceTracker to track JIT'd memory allocated to our
       // anonymous expression -- that way we can free it after executing.
-      // auto RT = TheJIT->getMainJITDylib().createResourceTracker();
+      auto RT = TheJIT->getMainJITDylib().createResourceTracker();
 
-      // auto TSM = ThreadSafeModule(std::move(TheModule), std::move(TheContext));
-      // ExitOnErr(TheJIT->addModule(std::move(TSM), RT));
-      // InitializeModuleAndPassManagers();
+      auto TSM = llvm::orc::ThreadSafeModule(std::move(TheModule), std::move(TheContext));
+      ExitOnErr(TheJIT->addModule(std::move(TSM), RT));
+      InitializeModuleAndPassManagers();
 
-       // Search the JIT for the __anon_expr symbol.
-      // auto ExprSymbol = ExitOnErr(TheJIT->lookup("__anon_expr"));
+      //  Search the JIT for the __anon_expr symbol.
+      auto ExprSymbol = ExitOnErr(TheJIT->lookup("__anon_expr"));
 
-      // // Get the symbol's address and cast it to the right type (takes no
-      // // arguments, returns a double) so we can call it as a native function.
-      // double (*FP)() = (double (*)())(intptr_t)ExprSymbol.getAddress();
-      // fprintf(stderr, "Evaluated to %f\n", FP());
+      // Get the symbol's address and cast it to the right type (takes no
+      // arguments, returns a double) so we can call it as a native function.
+      double (*FP)() = (double (*)())(intptr_t)ExprSymbol.getAddress();
+      fprintf(stderr, "Evaluated to %f\n", FP());
 
       // Delete the anonymous expression module from the JIT.
-      // ExitOnErr(RT->remove());
+      ExitOnErr(RT->remove());
 
       fprintf(stderr, "Read top-level expression:");
       FnIR->print(errs());

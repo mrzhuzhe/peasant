@@ -8,10 +8,13 @@
 //===----------------------------------------------------------------------===//
 
 void InitializeModuleAndPassManagers() {
+  
+  TheJIT = ExitOnErr(KaleidoscopeJIT::Create());
+
   // Open a new context and module.
   TheContext = std::make_unique<llvm::LLVMContext>();
   // TheModule = std::make_unique<llvm::Module>("My awesome JIT", *TheContext);
-  TheModule = std::make_unique<Module>("KaleidoscopeJIT", TheContext);
+  TheModule = std::make_unique<llvm::Module>("KaleidoscopeJIT", *TheContext);
   TheModule->setDataLayout(TheJIT->getDataLayout());
 
   // Create a new builder for the module.

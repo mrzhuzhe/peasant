@@ -16,6 +16,7 @@
 #include "ast/PrototypeAST.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include <map>
+#include "kaleidoscopeJIT.h"
 
 // This is an object that owns LLVM core data structures
 extern std::unique_ptr<llvm::LLVMContext> TheContext;
@@ -31,7 +32,6 @@ extern std::map<std::string, llvm::Value *> NamedValues;
 
 extern std::unique_ptr<KaleidoscopeJIT> TheJIT;
 
-// extern std::unique_ptr<KaleidoscopeJIT> TheJIT;
 extern std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
 // extern std::unique_ptr<LoopAnalysisManager> TheLAM;
 // extern std::unique_ptr<FunctionAnalysisManager> TheFAM;
