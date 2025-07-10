@@ -197,7 +197,7 @@ main: main.cpp ${OBJ}
 	${CC} ${CFLAGS} ${LLVMFLAGS} ${OBJ} $< -o $@.o  ${LDLIBS}
 #${LINKFLAG}
 clean:
-	rm -r ${OBJ}
+	rm -r ${OBJ} main.o
 
 %.o: %.cpp ${HEADERS}
 	${CC} ${CFLAGS} ${LLVMFLAGS} -c $< $ -o $@ 
