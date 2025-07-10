@@ -72,7 +72,7 @@ static void HandleExtern() {
       fprintf(stderr, "Read extern:");
       FnIR->print(errs());
       fprintf(stderr, "\n");
-      //FunctionProtos[ProtoAST->getName()] = std::move(ProtoAST);
+      FunctionProtos[ProtoAST->getName()] = std::move(ProtoAST);
     }
   } else {
     getNextToken();
@@ -82,7 +82,11 @@ static void HandleExtern() {
 static void HandleTopLevelExpression() {
   if (auto FnAST = ParseTopLevelExpr()) {
     if (auto *FnIR = FnAST->codegen()) {
-
+      
+      fprintf(stderr, "Read top-level expression:");
+      FnIR->print(errs());
+      fprintf(stderr, "\n");
+      
       // Create a ResourceTracker to track JIT'd memory allocated to our
       // anonymous expression -- that way we can free it after executing.
       auto RT = TheJIT->getMainJITDylib().createResourceTracker();
@@ -93,6 +97,7 @@ static void HandleTopLevelExpression() {
 
       //  Search the JIT for the __anon_expr symbol.
       auto ExprSymbol = ExitOnErr(TheJIT->lookup("__anon_expr"));
+      assert(ExprSymbol && "Function not found");
 
       // Get the symbol's address and cast it to the right type (takes no
       // arguments, returns a double) so we can call it as a native function.
@@ -102,9 +107,7 @@ static void HandleTopLevelExpression() {
       // Delete the anonymous expression module from the JIT.
       ExitOnErr(RT->remove());
 
-      fprintf(stderr, "Read top-level expression:");
-      FnIR->print(errs());
-      fprintf(stderr, "\n");
+
     }
   } else {
     getNextToken();
@@ -147,7 +150,7 @@ int main() {
   fprintf(stderr, "ready> ");
   getNextToken();
 
-  //TheJIT = ExitOnErr(KaleidoscopeJIT::Create());
+  TheJIT = ExitOnErr(KaleidoscopeJIT::Create());
 
   InitializeModuleAndPassManagers();
 

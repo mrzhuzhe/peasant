@@ -16,4 +16,6 @@ public:
   llvm::Value *codegen() override;
 };
 
+llvm::Function *getFunction(std::string Name);
+
 #endif

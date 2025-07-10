@@ -1,7 +1,7 @@
 #include "ast/CallExprAST.h"
 
-/*
-Function *getFunction(std::string Name) {
+
+llvm::Function *getFunction(std::string Name) {
   // First, see if the function has already been added to the current module.
   if (auto *F = TheModule->getFunction(Name))
     return F;
@@ -15,12 +15,11 @@ Function *getFunction(std::string Name) {
   // If no existing prototype exists, return null.
   return nullptr;
 }
-*/
 
 // Generate LLVM code for function calls
 llvm::Value *CallExprAST::codegen() {
-  llvm::Function *CalleeF = TheModule->getFunction(Callee);
-  //Function *CalleeF = getFunction(Callee);
+  // llvm::Function *CalleeF = TheModule->getFunction(Callee);
+  llvm::Function *CalleeF = getFunction(Callee);
   if (!CalleeF) {
     return LogErrorV("Unknown function referenced");
   }

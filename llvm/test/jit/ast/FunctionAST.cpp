@@ -1,11 +1,12 @@
 #include "ast/FunctionAST.h"
+#include "ast/CallExprAST.h"
 
 // Generates LLVM code for functions declarations
 llvm::Function *FunctionAST::codegen() {
-  // auto &P = *Proto;
-  // FunctionProtos[Proto->getName()] = std::move(Proto);
-  // Function *TheFunction = getFunction(P.getName());
-  llvm::Function *TheFunction = TheModule->getFunction(Proto->getName());
+  auto &P = *Proto;
+  FunctionProtos[Proto->getName()] = std::move(Proto);
+  llvm::Function *TheFunction = getFunction(P.getName());
+  // llvm::Function *TheFunction = TheModule->getFunction(Proto->getName());
 
   if (!TheFunction) {
     TheFunction = Proto->codegen();
