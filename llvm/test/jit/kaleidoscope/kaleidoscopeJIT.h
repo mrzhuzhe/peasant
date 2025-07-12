@@ -106,11 +106,11 @@ private:
       // Create a function pass manager.
       auto FPM = std::make_unique<llvm::legacy::FunctionPassManager>(&M);
 
-      // // Add some optimizations.
-      // FPM->add(llvm::createInstructionCombiningPass());
-      // FPM->add(llvm::createReassociatePass());
-      // FPM->add(llvm::createGVNPass());
-      // FPM->add(llvm::createCFGSimplificationPass());
+      // Add some optimizations.
+      FPM->add(llvm::createInstructionCombiningPass());
+      FPM->add(llvm::createReassociatePass());
+      FPM->add(llvm::createGVNPass());
+      FPM->add(llvm::createCFGSimplificationPass());
       FPM->doInitialization();
 
       // Run the optimizations over all functions in the module being added to
