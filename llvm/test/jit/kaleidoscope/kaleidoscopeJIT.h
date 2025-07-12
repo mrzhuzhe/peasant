@@ -1,6 +1,8 @@
 // basic https://llvm.org/docs/tutorial/BuildingAJIT1.html
 // opt https://llvm.org/docs/tutorial/BuildingAJIT2.html
 // orc v2 https://llvm.org/docs/ORCv2.html
+// but what is lazy complie
+
 #ifndef LLVM_EXECUTIONENGINE_ORC_KALEIDOSCOPEJIT_H
 #define LLVM_EXECUTIONENGINE_ORC_KALEIDOSCOPEJIT_H
 
@@ -18,6 +20,13 @@
 #include "llvm/IR/LLVMContext.h"
 #include <memory>
 
+#include "llvm/ExecutionEngine/Orc/IRTransformLayer.h"
+
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Scalar/GVN.h"
+
 // namespace llvm {
 // namespace orc {
 
@@ -30,7 +39,8 @@ private:
 
   llvm::orc::RTDyldObjectLinkingLayer ObjectLayer;
   llvm::orc::IRCompileLayer CompileLayer;
-
+  llvm::orc::IRTransformLayer OptimizeLayer;
+  
   llvm::orc::JITDylib &MainJD;
 
 public:
@@ -41,6 +51,7 @@ public:
                     []() { return std::make_unique<llvm::SectionMemoryManager>(); }),
         CompileLayer(*this->ES, ObjectLayer,
                      std::make_unique<llvm::orc::ConcurrentIRCompiler>(std::move(JTMB))),
+        OptimizeLayer(*this->ES, CompileLayer, optimizeModule),
         MainJD(this->ES->createBareJITDylib("<main>")) {
     MainJD.addGenerator(
         cantFail(llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess(
@@ -81,11 +92,34 @@ public:
   llvm::Error addModule(llvm::orc::ThreadSafeModule TSM, llvm::orc::ResourceTrackerSP RT = nullptr) {
     if (!RT)
       RT = MainJD.getDefaultResourceTracker();
-    return CompileLayer.add(RT, std::move(TSM));
+    return OptimizeLayer.add(RT, std::move(TSM));
   }
 
   llvm::Expected<llvm::JITEvaluatedSymbol> lookup(llvm::StringRef Name) {
     return ES->lookup({&MainJD}, Mangle(Name.str()));
+  }
+
+private:
+  static llvm::Expected<llvm::orc::ThreadSafeModule>
+  optimizeModule(llvm::orc::ThreadSafeModule TSM, const llvm::orc::MaterializationResponsibility &R) {
+    TSM.withModuleDo([](llvm::Module &M) {
+      // Create a function pass manager.
+      auto FPM = std::make_unique<llvm::legacy::FunctionPassManager>(&M);
+
+      // // Add some optimizations.
+      // FPM->add(llvm::createInstructionCombiningPass());
+      // FPM->add(llvm::createReassociatePass());
+      // FPM->add(llvm::createGVNPass());
+      // FPM->add(llvm::createCFGSimplificationPass());
+      FPM->doInitialization();
+
+      // Run the optimizations over all functions in the module being added to
+      // the JIT.
+      for (auto &F : M)
+        FPM->run(F);
+    });
+
+    return std::move(TSM);
   }
 };
 
