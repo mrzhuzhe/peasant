@@ -196,6 +196,9 @@ LDLIBS = -lLLVMWindowsManifest \
 main: main.cpp ${OBJ}
 	${CC} ${CFLAGS} ${LLVMFLAGS} ${OBJ} $< -o $@.o  ${LDLIBS}
 #${LINKFLAG}
+
+test: main.cpp ${OBJ}
+	llc ${CFLAGS} ${LLVMFLAGS} ${OBJ} $< -o $@.ll  ${LDLIBS}
 clean:
 	rm -r ${OBJ} main.o
 
