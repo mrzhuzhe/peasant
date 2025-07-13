@@ -4,5 +4,11 @@ def test(x)
   else
     x+2
 
+def fib(x)
+  if x < 3 then
+    1
+  else
+    fib(x-1)+fib(x-2);
+    
 # llvm-as < test.ll | opt -passes=view-cfg
 # dot -Tsvg /tmp/cfg.test-7011b9.dot > output.svg
