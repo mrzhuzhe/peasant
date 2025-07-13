@@ -8,9 +8,9 @@ llvm::Function *FunctionAST::codegen() {
   llvm::Function *TheFunction = getFunction(P.getName());
   // llvm::Function *TheFunction = TheModule->getFunction(Proto->getName());
 
-  if (!TheFunction) {
-    TheFunction = Proto->codegen();
-  }
+  // if (!TheFunction) {
+  //   TheFunction = Proto->codegen();
+  // }
 
   if (!TheFunction) {
     return nullptr;

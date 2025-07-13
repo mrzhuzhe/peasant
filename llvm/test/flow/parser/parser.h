@@ -12,6 +12,9 @@
 #include "lexer/lexer.h"
 #include "lexer/token.h"
 
+#include "ast/IfExprAST.h"
+#include "ast/ForExprAST.h"
+
 extern std::map<char, int> BinopPrecedence;
 std::unique_ptr<ExprAST> ParseNumberExpr();
 std::unique_ptr<ExprAST> ParseParenExpr();
@@ -23,5 +26,9 @@ std::unique_ptr<PrototypeAST> ParsePrototype();
 std::unique_ptr<FunctionAST> ParseDefinition();
 std::unique_ptr<FunctionAST> ParseTopLevelExpr();
 std::unique_ptr<PrototypeAST> ParseExtern();
+
+std::unique_ptr<ExprAST> ParseIfExpr();
+std::unique_ptr<ExprAST> ParseForExpr();
+
 
 #endif
