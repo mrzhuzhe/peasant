@@ -1,0 +1,8 @@
+def test(x)
+  if x < 3 then
+    x+1
+  else
+    x+2
+
+# llvm-as < test.ll | opt -passes=view-cfg
+# dot -Tsvg /tmp/cfg.test-7011b9.dot > output.svg
