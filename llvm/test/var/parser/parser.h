@@ -30,5 +30,6 @@ std::unique_ptr<PrototypeAST> ParseExtern();
 std::unique_ptr<ExprAST> ParseIfExpr();
 std::unique_ptr<ExprAST> ParseForExpr();
 
+std::unique_ptr<ExprAST> ParseVarExpr();
 
 #endif
