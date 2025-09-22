@@ -11,6 +11,11 @@ llc https://llvm.org/docs/CommandGuide/llc.html
 
 posix regexp.h
 
+## LLVM test suite
+cmake -DCMAKE_BUILD_TYPE=Debug -DLLVM_ENABLE_PROJECTS="clang;compiler-rt" \
+    -DLLVM_OPTIMIZED_TABLEGEN=On \
+    -DLLVM_PARALLEL_COMPILE_JOBS=8 -DLLVM_PARALLEL_LINK_JOBS=1 ../llvm
+
 
 ## Done
 
@@ -20,3 +25,4 @@ posix regexp.h
 ## Todos 
 
 1. JIT
+2. why dialect exist
