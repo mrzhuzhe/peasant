@@ -1,20 +1,23 @@
-
-# Reffers
-
-wordcode https://llvm.org/devmtg/2011-09-16/EuroLLVM2011-MoreTargetIndependentLLVMBitcode.pdf
-
-MLIR talk https://mlir.llvm.org/talks/
-
-llc https://llvm.org/docs/CommandGuide/llc.html
-
-## Other 
-
-posix regexp.h
-
-## LLVM test suite
-cmake -DCMAKE_BUILD_TYPE=Debug -DLLVM_ENABLE_PROJECTS="clang;compiler-rt" \
+## LLVM debug for test suite
+cmake -DCMAKE_BUILD_TYPE=Debug \
+    -DLLVM_ENABLE_PROJECTS="clang;compiler-rt" \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_OPTIMIZED_TABLEGEN=On \
-    -DLLVM_PARALLEL_COMPILE_JOBS=8 -DLLVM_PARALLEL_LINK_JOBS=1 ../llvm
+    -DLLVM_PARALLEL_COMPILE_JOBS=8 \
+    -DLLVM_PARALLEL_LINK_JOBS=1 \
+    ../llvm
+
+## LLVM CPU0
+cmake -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_CXX_COMPILER=clang++ \
+  -DCMAKE_C_COMPILER=clang \
+  -DLLVM_TARGETS_TO_BUILD=Cpu0 \
+  -DLLVM_ENABLE_PROJECTS="clang" \
+  -DLLVM_OPTIMIZED_TABLEGEN=On \
+  -DLLVM_PARALLEL_COMPILE_JOBS=4 \
+  -DLLVM_PARALLEL_LINK_JOBS=1 \
+  -G "Unix Makefiles" ../llvm \
+  time make -j4
 
 
 ## LLVM origin
@@ -22,7 +25,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug -DLLVM_ENABLE_PROJECTS="clang;compiler-rt" \
 cmake -DLLVM_ENABLE_PROJECTS="mlir" \ 
     -DLLVM_BUILD_EXAMPLES=ON \
     -DLLVM_TARGETS_TO_BUILD="X86;NVPTX" \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_BUILD_TYPE=Debug \
     -DLLVM_ENABLE_ASSERTIONS=ON \
     ../llvm
 
@@ -36,12 +39,12 @@ cmake -DLLVM_ENABLE_PROJECTS="mlir" \
 # -DMLIR_INCLUDE_INTEGRATION_TESTS=ON
 cmake --build . --target check-mlir
 
-## Done
 
-1. optimize pass
+## LLVM test suite
 
-
-## Todos 
-
-1. JIT
-2. why dialect exist
+cmake -DCMAKE_C_COMPILER=$(pwd)/../debug/build/bin/clang \
+    -C../llvm-test-suite/cmake/caches/O3.cmake \
+    -DCMAKE_C_FLAGS=-fPIE \
+    -DCMAKE_CXX_FLAGS=-fPIE \
+    ../llvm-test-suite
+  make
