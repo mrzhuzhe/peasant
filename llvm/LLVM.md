@@ -37,3 +37,8 @@ cmake -DCMAKE_C_COMPILER=$(pwd)/../debug/build/bin/clang \
     -DCMAKE_CXX_FLAGS=-fPIE \
     ../llvm-test-suite
   make
+
+## Todos
+
+1. llvm ir seems can be directly compile into GPU backend
+2. mlir seem to be standalone with mlir
