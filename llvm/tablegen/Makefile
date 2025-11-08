@@ -7,13 +7,15 @@ LLVM_TBLGEN  := llvm-tblgen  # llvm-tblgen tool
 
 # output files
 RECORDS = class.inc let.inc template.inc multiclass.inc foreach.inc
-FOOINC = FooGenRegisterInfo.inc
+FOOINC = FooGenRegisterInfo.inc FooGenRegisterInfoOrigin.inc
 
 all: ${RECORDS} ${FOOINC}
 
 ${RECORDS}: %.inc: Records/%.td
 	${LLVM_TBLGEN} $< -o outputs/$@
 
+FooGenRegisterInfoOrigin.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -o outputs/$@
 
 FooGenRegisterInfo.inc: Instr/*.td
 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-register-info -o outputs/$@
