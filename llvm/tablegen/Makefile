@@ -7,7 +7,9 @@ LLVM_TBLGEN  := llvm-tblgen  # llvm-tblgen tool
 
 # output files
 RECORDS = class.inc let.inc template.inc multiclass.inc foreach.inc
-FOOINC = FooGenRegisterInfo.inc FooGenRegisterInfoOrigin.inc
+FOOINC = FooGenRegisterInfo.inc FooGenRegisterInfoOrigin.inc FooGenInstrInfo.inc FooGenMCCodeEmitter.inc \
+FooGenMCPseudoLowering.inc FooGenAsmMatcher.inc FooGenAsmWriter.inc FooGenAsmWriter.inc FooGenDAGISel.inc \
+FooGenSubtargetInfo.inc FooGenDisassemblerTables.inc FooGenDFAPacketizer.inc
 
 all: ${RECORDS} ${FOOINC}
 
@@ -20,32 +22,32 @@ FooGenRegisterInfoOrigin.inc: Instr/*.td
 FooGenRegisterInfo.inc: Instr/*.td
 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-register-info -o outputs/$@
 
-# FooGenInstrInfo.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-instr-info -o $@
+FooGenInstrInfo.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-instr-info -o outputs/$@
 
-# FooGenMCCodeEmitter.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-emitter -o $@
+FooGenMCCodeEmitter.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-emitter -o outputs/$@
 
-# FooGenMCPseudoLowering.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-pseudo-lowering -o $@
+FooGenMCPseudoLowering.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-pseudo-lowering -o outputs/$@
 
-# FooGenAsmMatcher.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-asm-matcher -o $@
+FooGenAsmMatcher.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-asm-matcher -o outputs/$@
 
-# FooGenAsmWriter.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-asm-writer -o $@
+FooGenAsmWriter.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-asm-writer -o outputs/$@
 
-# FooGenDAGISel.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-dag-isel -o $@
+FooGenDAGISel.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-dag-isel -o outputs/$@
 
-# FooGenSubtargetInfo.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-subtarget -o $@
+FooGenSubtargetInfo.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-subtarget -o outputs/$@
 
-# FooGenDisassemblerTables.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-disassembler -o $@
+FooGenDisassemblerTables.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-disassembler -o outputs/$@
 
-# FooGenDFAPacketizer.inc: Foo/*.td
-# 	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Foo Foo/Foo.td -gen-dfa-packetizer -o $@
+FooGenDFAPacketizer.inc: Instr/*.td
+	${LLVM_TBLGEN} -I ${LLVM_INCLUDE} -I Instr Instr/Foo.td -gen-dfa-packetizer -o outputs/$@
 
 clean:
 	rm -f *.inc

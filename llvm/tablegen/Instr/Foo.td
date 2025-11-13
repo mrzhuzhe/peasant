@@ -14,19 +14,19 @@ include "FooRegisterInfo.td"
 // Instruction Description
 //===----------------------------------------------------------------------===//
 
-//include "FooInstrInfo.td"
-//def FooInstrInfo : InstrInfo;
+include "FooInstrInfo.td"
+def FooInstrInfo : InstrInfo;
 
 //===----------------------------------------------------------------------===//
 // Instruction Schedule
 //===----------------------------------------------------------------------===//
 
-//include "FooSchedule.td"
+include "FooSchedule.td"
 
 //===----------------------------------------------------------------------===//
 // Define the Foo target.
 //===----------------------------------------------------------------------===//
 
 def Foo : Target {
-//  let InstructionSet = FooInstrInfo;
+  let InstructionSet = FooInstrInfo;
 }
