@@ -9,7 +9,7 @@ https://mlir.llvm.org/docs/Dialects/GPU/
 
 ## Build
 
-
+```
 cmake -DLLVM_ENABLE_PROJECTS="mlir" \
     -DLLVM_BUILD_EXAMPLES=ON \
     -DLLVM_TARGETS_TO_BUILD="X86;NVPTX" \
@@ -27,3 +27,4 @@ cmake -DLLVM_ENABLE_PROJECTS="mlir" \
 # Optionally, enabling integration tests as well
 # -DMLIR_INCLUDE_INTEGRATION_TESTS=ON
 cmake --build . --target check-mlir
+```
