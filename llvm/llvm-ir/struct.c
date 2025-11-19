@@ -5,6 +5,7 @@ struct tests {
     int c;
     long d;
 };
+
 int g = 123;
 struct testsfather {
     float e;
@@ -24,5 +25,6 @@ int main(){
     test1.f = &g;
     test1.h = 66;
     test1.i = "you are silly pink";
+
     return 0;
 }
