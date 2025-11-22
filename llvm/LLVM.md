@@ -42,3 +42,6 @@ cmake -DCMAKE_C_COMPILER=$(pwd)/../debug/build/bin/clang \
 
 1. llvm ir seems can be directly compile into GPU backend
 2. mlir seem to be standalone with mlir
+3. opcode like beq 0x37 is corresponding to verilog opcode
+  build/lib/Target/Cpu0/Cpu0GenInstrInfo.inc 269
+  def BEQ     : CBranch16<0x37, "beq", seteq, GPROut>;
