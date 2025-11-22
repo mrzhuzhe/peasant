@@ -10,3 +10,4 @@ all:
 	clang -S -emit-llvm for.c
 	clang -S -emit-llvm call.c
 	clang -S -emit-llvm struct.c
+	clang -S -emit-llvm goto.c

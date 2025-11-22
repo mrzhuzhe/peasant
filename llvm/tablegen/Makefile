@@ -2,7 +2,7 @@
 # todo thereis a bug in let
 
 
-LLVM_INCLUDE := /mnt/Data/software/llvm-22-x86/install/include # llvm include directory
+LLVM_INCLUDE := /home/sanszhu/software/llvm-22-x86/install/include # llvm include directory
 LLVM_TBLGEN  := llvm-tblgen  # llvm-tblgen tool
 
 # output files

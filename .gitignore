@@ -67,3 +67,4 @@ outputs
 
 sdkconfig
 sdkconfig.*
+llvm/llvm-ir/*.ll
