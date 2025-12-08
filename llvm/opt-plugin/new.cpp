@@ -1,4 +1,5 @@
 //  opt -load-pass-plugin=build/libnew.so -passes="Helloworld2" outputs/aa.ll  -S
+//  https://github.com/10x-Engineers/tutorial-llvm-pass/blob/main/HelloWorld/HelloWorld.cpp
 
 #include "llvm/IR/PassManager.h"
 #include "llvm/Passes/PassBuilder.h"
@@ -12,6 +13,7 @@ namespace llvm {
                                         FunctionAnalysisManager &AM) {
             errs() << "function name is \n" ;
             errs() << F.getName() << "\n";
+            errs() << "  number of arguments: " << F.arg_size() << "\n";
             return PreservedAnalyses::all();
         }
     };    
@@ -21,10 +23,10 @@ namespace llvm {
 llvm::PassPluginLibraryInfo getHelloworldPluginInfo() {
   return {LLVM_PLUGIN_API_VERSION, "Helloworld2", LLVM_VERSION_STRING,
           [](llvm::PassBuilder &PB) {
-            PB.registerVectorizerStartEPCallback(
-                [](llvm::FunctionPassManager &PM, llvm::OptimizationLevel Level) {
-                  PM.addPass(llvm::HelloWorldPass2());
-                });
+            // PB.registerVectorizerStartEPCallback(
+            //     [](llvm::FunctionPassManager &PM, llvm::OptimizationLevel Level) {
+            //       PM.addPass(llvm::HelloWorldPass2());
+            //     });
             PB.registerPipelineParsingCallback(
                 [](llvm::StringRef Name, llvm::FunctionPassManager &PM,
                    llvm::ArrayRef<llvm::PassBuilder::PipelineElement>) {
