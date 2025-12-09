@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.20.0)
+project(SimpleProject)
+
+find_package(LLVM REQUIRED CONFIG)
+
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+# Set your project compile flags.
+# E.g. if using the C++ header files
+# you will need to enable C++11 support
+# for your compiler.
+
+include_directories(${LLVM_INCLUDE_DIRS})
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+add_definitions(${LLVM_DEFINITIONS_LIST})
+
+link_directories(${LLVM_LIBRARY_DIR})
+
+# LLVM is normally built without RTTI. Be consistent with that.
+if(NOT LLVM_ENABLE_RTTI)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+endif()
+
+# message(STATUS ${LLVM_INCLUDE_DIRS})
+
+# Now build our tools
+# add_executable(legacy test.cpp)
+# add_llvm_pass_plugin(legacy legacy.cpp)
+add_library(legacy SHARED legacy.cpp)
+# add_llvm_library(legacy MODULE test.cpp)
+
+add_library(new SHARED new.cpp)
+
+# Link against LLVM libraries
+# target_link_libraries(legacy ${llvm_libs})
+# target_link_libraries(new ${llvm_libs})
