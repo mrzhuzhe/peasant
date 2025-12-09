@@ -1,36 +1,30 @@
-// opt -load-pass-plugin=build/liblegacy.so -passes="goodbye" outputs/aa.ll --wave-goodbye=true -S
+// opt -load-pass-plugin=build/libmodules.so -passes="goodbye" outputs/aa.ll -S
 #include "llvm/IR/Function.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Pass.h"
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Passes/PassPlugin.h"
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/raw_ostream.h"
 
 using namespace llvm;
 
-static cl::opt<bool> Wave("wave-goodbye", cl::init(false),
-                          cl::desc("wave good bye"));
-
 namespace {
 
-bool runBye(Function &F) {
-  if (Wave) {
-    errs() << "Bye: ";
-    errs().write_escaped(F.getName()) << '\n';
-  }
+bool runBye(Module &M) {
+  
+  errs() << "Bye: ";
+  errs().write_escaped(M.getName()) << '\n';
   return false;
 }
 
-struct LegacyBye : public FunctionPass {
+struct LegacyBye : public ModulePass {
   static char ID;
-  LegacyBye() : FunctionPass(ID) {}
-  bool runOnFunction(Function &F) override { return runBye(F); }
+  LegacyBye() : ModulePass(ID) {}
+  bool runOnModule(Module &M) override { return runBye(M); }
 };
 
 struct Bye : PassInfoMixin<Bye> {
-  PreservedAnalyses run(Function &F, FunctionAnalysisManager &) {
-    if (!runBye(F))
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
+    if (!runBye(M))
       return PreservedAnalyses::all();
     return PreservedAnalyses::none();
   }
@@ -48,12 +42,8 @@ static RegisterPass<LegacyBye> X("goodbye", "Good Bye World Pass",
 llvm::PassPluginLibraryInfo getByePluginInfo() {
   return {LLVM_PLUGIN_API_VERSION, "Bye", LLVM_VERSION_STRING,
           [](PassBuilder &PB) {
-            PB.registerVectorizerStartEPCallback(
-                [](llvm::FunctionPassManager &PM, OptimizationLevel Level) {
-                  PM.addPass(Bye());
-                });
             PB.registerPipelineParsingCallback(
-                [](StringRef Name, llvm::FunctionPassManager &PM,
+                [](StringRef Name, llvm::ModulePassManager &PM,
                    ArrayRef<llvm::PassBuilder::PipelineElement>) {
                   if (Name == "goodbye") {
                     PM.addPass(Bye());

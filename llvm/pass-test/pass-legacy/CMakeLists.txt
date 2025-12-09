@@ -27,5 +27,6 @@ endif()
 # Now build our tools
 # add_executable(legacy test.cpp)
 # add_llvm_pass_plugin(legacy legacy.cpp)
-add_library(legacy SHARED legacy.cpp)
+add_library(modules SHARED modules.cpp)
 # add_llvm_library(legacy MODULE test.cpp)
+# add_library(loop SHARED loop.cpp)
