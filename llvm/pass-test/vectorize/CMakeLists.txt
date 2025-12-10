@@ -29,15 +29,12 @@ add_library(new SHARED
   LoopVectorizationLegality.cpp
   LoopVectorize.cpp
   new.cpp
-  SLPVectorizer.cpp
-  VectorCombine.cpp
   Vectorize.cpp
   VPlanAnalysis.cpp
   VPlanConstruction.cpp
   VPlan.cpp
   VPlanPredicator.cpp
   VPlanRecipes.cpp
-  VPlanSLP.cpp
   VPlanTransforms.cpp
   VPlanUnroll.cpp
   VPlanUtils.cpp

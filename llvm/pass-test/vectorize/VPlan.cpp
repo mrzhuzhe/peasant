@@ -67,7 +67,7 @@ const char LLVMLoopVectorizeFollowupEpilogue[] =
 
 extern cl::opt<unsigned> ForceTargetInstructionCost;
 
-static cl::opt<bool> PrintVPlansInDotFormat(
+static cl::opt<bool> zzPrintVPlansInDotFormat(
     "vplan-print-in-dot-format", cl::Hidden,
     cl::desc("Use dot format instead of plain text when dumping VPlans"));
 
@@ -1743,7 +1743,7 @@ void LoopVectorizationPlanner::printPlans(raw_ostream &O) {
     return;
   }
   for (const auto &Plan : VPlans)
-    if (PrintVPlansInDotFormat)
+    if (zzPrintVPlansInDotFormat)
       Plan->printDOT(O);
     else
       Plan->print(O);
