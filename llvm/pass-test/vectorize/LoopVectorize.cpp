@@ -171,30 +171,30 @@ STATISTIC(LoopsEpilogueVectorized, "Number of epilogues vectorized");
 STATISTIC(LoopsEarlyExitVectorized, "Number of early exit loops vectorized");
 
 static cl::opt<bool> EnableEpilogueVectorization(
-    "enable-epilogue-vectorization", cl::init(true), cl::Hidden,
+    "enable-epilogue-vectorization-zz", cl::init(true), cl::Hidden,
     cl::desc("Enable vectorization of epilogue loops."));
 
 static cl::opt<unsigned> EpilogueVectorizationForceVF(
-    "epilogue-vectorization-force-VF", cl::init(1), cl::Hidden,
+    "epilogue-vectorization-force-VF-zz", cl::init(1), cl::Hidden,
     cl::desc("When epilogue vectorization is enabled, and a value greater than "
              "1 is specified, forces the given VF for all applicable epilogue "
              "loops."));
 
 static cl::opt<unsigned> EpilogueVectorizationMinVF(
-    "epilogue-vectorization-minimum-VF", cl::Hidden,
+    "epilogue-vectorization-minimum-VF-zz", cl::Hidden,
     cl::desc("Only loops with vectorization factor equal to or larger than "
              "the specified value are considered for epilogue vectorization."));
 
 /// Loops with a known constant trip count below this number are vectorized only
 /// if no scalar iteration overheads are incurred.
 static cl::opt<unsigned> TinyTripCountVectorThreshold(
-    "vectorizer-min-trip-count", cl::init(16), cl::Hidden,
+    "vectorizer-min-trip-count-zz", cl::init(16), cl::Hidden,
     cl::desc("Loops with a constant trip count that is smaller than this "
              "value are vectorized only if no scalar iteration overheads "
              "are incurred."));
 
 static cl::opt<unsigned> VectorizeMemoryCheckThreshold(
-    "vectorize-memory-check-threshold", cl::init(128), cl::Hidden,
+    "vectorize-memory-check-threshold-zz", cl::init(128), cl::Hidden,
     cl::desc("The maximum allowed number of runtime memory checks"));
 
 // Option prefer-predicate-over-epilogue indicates that an epilogue is undesired,
@@ -211,7 +211,7 @@ namespace PreferPredicateTy {
 } // namespace PreferPredicateTy
 
 static cl::opt<PreferPredicateTy::Option> PreferPredicateOverEpilogue(
-    "prefer-predicate-over-epilogue",
+    "prefer-predicate-over-epilogue-zz",
     cl::init(PreferPredicateTy::ScalarEpilogue),
     cl::Hidden,
     cl::desc("Tail-folding and predication preferences over creating a scalar "
@@ -229,7 +229,7 @@ static cl::opt<PreferPredicateTy::Option> PreferPredicateOverEpilogue(
                          "tail-folding fails.")));
 
 static cl::opt<TailFoldingStyle> ForceTailFoldingStyle(
-    "force-tail-folding-style", cl::desc("Force the tail folding style"),
+    "force-tail-folding-style-zz", cl::desc("Force the tail folding style"),
     cl::init(TailFoldingStyle::None),
     cl::values(
         clEnumValN(TailFoldingStyle::None, "none", "Disable tail folding"),
@@ -250,108 +250,108 @@ static cl::opt<TailFoldingStyle> ForceTailFoldingStyle(
                    "is unsupported, fallback to data-without-lane-mask.")));
 
 static cl::opt<bool> MaximizeBandwidth(
-    "vectorizer-maximize-bandwidth", cl::init(false), cl::Hidden,
+    "vectorizer-maximize-bandwidth-zz", cl::init(false), cl::Hidden,
     cl::desc("Maximize bandwidth when selecting vectorization factor which "
              "will be determined by the smallest type in loop."));
 
 static cl::opt<bool> EnableInterleavedMemAccesses(
-    "enable-interleaved-mem-accesses", cl::init(false), cl::Hidden,
+    "enable-interleaved-mem-accesses-zz", cl::init(false), cl::Hidden,
     cl::desc("Enable vectorization on interleaved memory accesses in a loop"));
 
 /// An interleave-group may need masking if it resides in a block that needs
 /// predication, or in order to mask away gaps.
 static cl::opt<bool> EnableMaskedInterleavedMemAccesses(
-    "enable-masked-interleaved-mem-accesses", cl::init(false), cl::Hidden,
+    "enable-masked-interleaved-mem-accesses-zz", cl::init(false), cl::Hidden,
     cl::desc("Enable vectorization on masked interleaved memory accesses in a loop"));
 
 static cl::opt<unsigned> ForceTargetNumScalarRegs(
-    "force-target-num-scalar-regs", cl::init(0), cl::Hidden,
+    "force-target-num-scalar-regs-zz", cl::init(0), cl::Hidden,
     cl::desc("A flag that overrides the target's number of scalar registers."));
 
 static cl::opt<unsigned> ForceTargetNumVectorRegs(
-    "force-target-num-vector-regs", cl::init(0), cl::Hidden,
+    "force-target-num-vector-regs-zz", cl::init(0), cl::Hidden,
     cl::desc("A flag that overrides the target's number of vector registers."));
 
 static cl::opt<unsigned> ForceTargetMaxScalarInterleaveFactor(
-    "force-target-max-scalar-interleave", cl::init(0), cl::Hidden,
+    "force-target-max-scalar-interleave-zz", cl::init(0), cl::Hidden,
     cl::desc("A flag that overrides the target's max interleave factor for "
              "scalar loops."));
 
 static cl::opt<unsigned> ForceTargetMaxVectorInterleaveFactor(
-    "force-target-max-vector-interleave", cl::init(0), cl::Hidden,
+    "force-target-max-vector-interleave-zz", cl::init(0), cl::Hidden,
     cl::desc("A flag that overrides the target's max interleave factor for "
              "vectorized loops."));
 
 cl::opt<unsigned> llvm::ForceTargetInstructionCost(
-    "force-target-instruction-cost", cl::init(0), cl::Hidden,
+    "force-target-instruction-cost-zz", cl::init(0), cl::Hidden,
     cl::desc("A flag that overrides the target's expected cost for "
              "an instruction to a single constant value. Mostly "
              "useful for getting consistent testing."));
 
 static cl::opt<bool> ForceTargetSupportsScalableVectors(
-    "force-target-supports-scalable-vectors", cl::init(false), cl::Hidden,
+    "force-target-supports-scalable-vectors-zz", cl::init(false), cl::Hidden,
     cl::desc(
         "Pretend that scalable vectors are supported, even if the target does "
         "not support them. This flag should only be used for testing."));
 
 static cl::opt<unsigned> SmallLoopCost(
-    "small-loop-cost", cl::init(20), cl::Hidden,
+    "small-loop-cost-zz", cl::init(20), cl::Hidden,
     cl::desc(
         "The cost of a loop that is considered 'small' by the interleaver."));
 
 static cl::opt<bool> LoopVectorizeWithBlockFrequency(
-    "loop-vectorize-with-block-frequency", cl::init(true), cl::Hidden,
+    "loop-vectorize-with-block-frequency-zz", cl::init(true), cl::Hidden,
     cl::desc("Enable the use of the block frequency analysis to access PGO "
              "heuristics minimizing code growth in cold regions and being more "
              "aggressive in hot regions."));
 
 // Runtime interleave loops for load/store throughput.
 static cl::opt<bool> EnableLoadStoreRuntimeInterleave(
-    "enable-loadstore-runtime-interleave", cl::init(true), cl::Hidden,
+    "enable-loadstore-runtime-interleave-zz", cl::init(true), cl::Hidden,
     cl::desc(
         "Enable runtime interleaving until load/store ports are saturated"));
 
 /// The number of stores in a loop that are allowed to need predication.
 static cl::opt<unsigned> NumberOfStoresToPredicate(
-    "vectorize-num-stores-pred", cl::init(1), cl::Hidden,
+    "vectorize-num-stores-pred-zz", cl::init(1), cl::Hidden,
     cl::desc("Max number of stores to be predicated behind an if."));
 
 static cl::opt<bool> EnableIndVarRegisterHeur(
-    "enable-ind-var-reg-heur", cl::init(true), cl::Hidden,
+    "enable-ind-var-reg-heur-zz", cl::init(true), cl::Hidden,
     cl::desc("Count the induction variable only once when interleaving"));
 
 static cl::opt<bool> EnableCondStoresVectorization(
-    "enable-cond-stores-vec", cl::init(true), cl::Hidden,
+    "enable-cond-stores-vec-zz", cl::init(true), cl::Hidden,
     cl::desc("Enable if predication of stores during vectorization."));
 
 static cl::opt<unsigned> MaxNestedScalarReductionIC(
-    "max-nested-scalar-reduction-interleave", cl::init(2), cl::Hidden,
+    "max-nested-scalar-reduction-interleave-zz", cl::init(2), cl::Hidden,
     cl::desc("The maximum interleave count to use when interleaving a scalar "
              "reduction in a nested loop."));
 
 static cl::opt<bool>
-    PreferInLoopReductions("prefer-inloop-reductions", cl::init(false),
+    PreferInLoopReductions("prefer-inloop-reductions-zz", cl::init(false),
                            cl::Hidden,
                            cl::desc("Prefer in-loop vector reductions, "
                                     "overriding the targets preference."));
 
 static cl::opt<bool> ForceOrderedReductions(
-    "force-ordered-reductions", cl::init(false), cl::Hidden,
+    "force-ordered-reductions-zz", cl::init(false), cl::Hidden,
     cl::desc("Enable the vectorisation of loops with in-order (strict) "
              "FP reductions"));
 
 static cl::opt<bool> PreferPredicatedReductionSelect(
-    "prefer-predicated-reduction-select", cl::init(false), cl::Hidden,
+    "prefer-predicated-reduction-select-zz", cl::init(false), cl::Hidden,
     cl::desc(
         "Prefer predicating a reduction operation over an after loop select."));
 
 cl::opt<bool> llvm::EnableVPlanNativePath(
-    "enable-vplan-native-path", cl::Hidden,
+    "enable-vplan-native-path-zz", cl::Hidden,
     cl::desc("Enable VPlan-native vectorization path with "
              "support for outer loop vectorization."));
 
 cl::opt<bool>
-    llvm::VerifyEachVPlan("vplan-verify-each",
+    llvm::VerifyEachVPlan("vplan-verify-each-zz",
 #ifdef EXPENSIVE_CHECKS
                           cl::init(true),
 #else
@@ -365,36 +365,36 @@ cl::opt<bool>
 // -enable-vplan-native-path. -vplan-verify-hcfg can also be used to enable the
 // verification of the H-CFGs built.
 static cl::opt<bool> VPlanBuildStressTest(
-    "vplan-build-stress-test", cl::init(false), cl::Hidden,
+    "vplan-build-stress-test-zz", cl::init(false), cl::Hidden,
     cl::desc(
         "Build VPlan for every supported loop nest in the function and bail "
         "out right after the build (stress test the VPlan H-CFG construction "
         "in the VPlan-native vectorization path)."));
 
 cl::opt<bool> llvm::EnableLoopInterleaving(
-    "interleave-loops", cl::init(true), cl::Hidden,
+    "interleave-loops-zz", cl::init(true), cl::Hidden,
     cl::desc("Enable loop interleaving in Loop vectorization passes"));
 cl::opt<bool> llvm::EnableLoopVectorization(
-    "vectorize-loops", cl::init(true), cl::Hidden,
+    "vectorize-loops-zz", cl::init(true), cl::Hidden,
     cl::desc("Run the Loop vectorization passes"));
 
 static cl::opt<cl::boolOrDefault> ForceSafeDivisor(
-    "force-widen-divrem-via-safe-divisor", cl::Hidden,
+    "force-widen-divrem-via-safe-divisor-zz", cl::Hidden,
     cl::desc(
         "Override cost based safe divisor widening for div/rem instructions"));
 
 static cl::opt<bool> UseWiderVFIfCallVariantsPresent(
-    "vectorizer-maximize-bandwidth-for-vector-calls", cl::init(true),
+    "vectorizer-maximize-bandwidth-for-vector-calls-zz", cl::init(true),
     cl::Hidden,
     cl::desc("Try wider VFs if they enable the use of vector variants"));
 
 static cl::opt<bool> EnableEarlyExitVectorization(
-    "enable-early-exit-vectorization", cl::init(true), cl::Hidden,
+    "enable-early-exit-vectorization-zz", cl::init(true), cl::Hidden,
     cl::desc(
         "Enable vectorization of early exit loops with uncountable exits."));
 
 static cl::opt<bool> ConsiderRegPressure(
-    "vectorizer-consider-reg-pressure", cl::init(false), cl::Hidden,
+    "vectorizer-consider-reg-pressure-zz", cl::init(false), cl::Hidden,
     cl::desc("Discard VFs if their register pressure is too high."));
 
 // Likelyhood of bypassing the vectorized loop because there are zero trips left

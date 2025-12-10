@@ -37,33 +37,33 @@ using namespace PatternMatch;
 #define DEBUG_TYPE LV_NAME
 
 static cl::opt<bool>
-    EnableIfConversion("enable-if-conversion", cl::init(true), cl::Hidden,
+    EnableIfConversion("enable-if-conversion-zz", cl::init(true), cl::Hidden,
                        cl::desc("Enable if-conversion during vectorization."));
 
 static cl::opt<bool>
-AllowStridedPointerIVs("lv-strided-pointer-ivs", cl::init(false), cl::Hidden,
+AllowStridedPointerIVs("lv-strided-pointer-ivs-zz", cl::init(false), cl::Hidden,
                        cl::desc("Enable recognition of non-constant strided "
                                 "pointer induction variables."));
 
 static cl::opt<bool>
-    HintsAllowReordering("hints-allow-reordering", cl::init(true), cl::Hidden,
+    HintsAllowReordering("hints-allow-reordering-zz", cl::init(true), cl::Hidden,
                          cl::desc("Allow enabling loop hints to reorder "
                                   "FP operations during vectorization."));
 
 // TODO: Move size-based thresholds out of legality checking, make cost based
 // decisions instead of hard thresholds.
 static cl::opt<unsigned> VectorizeSCEVCheckThreshold(
-    "vectorize-scev-check-threshold", cl::init(16), cl::Hidden,
+    "vectorize-scev-check-threshold-zz", cl::init(16), cl::Hidden,
     cl::desc("The maximum number of SCEV checks allowed."));
 
 static cl::opt<unsigned> PragmaVectorizeSCEVCheckThreshold(
-    "pragma-vectorize-scev-check-threshold", cl::init(128), cl::Hidden,
+    "pragma-vectorize-scev-check-threshold-zz", cl::init(128), cl::Hidden,
     cl::desc("The maximum number of SCEV checks allowed with a "
              "vectorize(enable) pragma"));
 
 static cl::opt<LoopVectorizeHints::ScalableForceKind>
     ForceScalableVectorization(
-        "scalable-vectorization", cl::init(LoopVectorizeHints::SK_Unspecified),
+        "scalable-vectorization-zz", cl::init(LoopVectorizeHints::SK_Unspecified),
         cl::Hidden,
         cl::desc("Control whether the compiler can use scalable vectors to "
                  "vectorize a loop"),
@@ -80,7 +80,7 @@ static cl::opt<LoopVectorizeHints::ScalableForceKind>
                 "cost is inconclusive.")));
 
 static cl::opt<bool> EnableHistogramVectorization(
-    "enable-histogram-loop-vectorization", cl::init(false), cl::Hidden,
+    "enable-histogram-loop-vectorization-zz", cl::init(false), cl::Hidden,
     cl::desc("Enables autovectorization of some loops containing histograms"));
 
 /// Maximum vectorization interleave count.
