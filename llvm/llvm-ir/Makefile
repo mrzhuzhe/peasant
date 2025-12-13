@@ -11,3 +11,4 @@ all:
 	clang -S -emit-llvm call.c
 	clang -S -emit-llvm struct.c
 	clang -S -emit-llvm goto.c
+	clang -S -emit-llvm simd.c
