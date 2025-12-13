@@ -1,11 +1,4 @@
-opt -passes="annotation2metadata,\
-forceattrs,\
-inferattrs,\
-coro-early,\
-ipsccp,\
-require<globals-aa>,\
-function(invalidate<aa>),\
-require<profile-summary>,\
+opt -passes="inferattrs,\
 cgscc(devirt<4>(inline,\
 function-attrs<skip-non-recursive-function-attrs>,\
 function<eager-inv;no-rerun>(sroa<modify-cfg>,\
@@ -14,7 +7,6 @@ instcombine<max-iterations=1;no-verify-fixpoint>,\
 loop(loop-idiom,\
 indvars),\
 sroa<modify-cfg>,\
-vector-combine,\
 mldst-motion<no-split-footer-bb>,\
 gvn<>,\
 sccp,\
@@ -22,31 +14,21 @@ bdce,\
 correlated-propagation,\
 adce,\
 dse,\
-move-auto-init,\
-loop-mssa(licm<allowspeculation>),\
-coro-elide,\
 simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,\
 instcombine<max-iterations=1;no-verify-fixpoint>),\
 function-attrs,\
 function(require<should-not-run-function-passes>),\
 coro-split,\
 coro-annotation-elide)),\
-deadargelim,\
-coro-cleanup,\
 globalopt,\
 globaldce,\
-elim-avail-extern,\
-rpo-function-attrs,\
-recompute-globalsaa,\
 function<eager-inv>(drop-unnecessary-assumes,\
 lower-constant-intrinsics,\
-loop(loop-rotate<header-duplication;no-prepare-for-lto>,\
-loop-deletion),\
+loop(loop-rotate<header-duplication;no-prepare-for-lto>),\
 loop-distribute,\
 inject-tli-mappings,\
 loop-vectorize<no-interleave-forced-only;no-vectorize-forced-only;>,\
 infer-alignment,\
-loop-load-elim,\
 instcombine<max-iterations=1;no-verify-fixpoint>,\
 simplifycfg<bonus-inst-threshold=1;forward-switch-cond;switch-range-to-icmp;switch-to-lookup;no-keep-loops;hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,\
 transform-warning,\
