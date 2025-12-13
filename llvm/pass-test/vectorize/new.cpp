@@ -1,4 +1,9 @@
-//  opt -load-pass-plugin=build/libnew.so -passes="Helloworld2" outputs/aa.ll  -S
+/*
+  opt outputs/simd.ll -S > outputs/simd-noopt.ll
+  opt -load-pass-plugin=build/libnew.so -passes="zzVectorize" outputs/simd.ll  -S > outputs/simd-opt.ll
+  opt -passes="loop-vectorize" outputs/simd.ll  -S > outputs/simd-opt3.ll
+*/  
+
 //  https://github.com/10x-Engineers/tutorial-llvm-pass/blob/main/HelloWorld/HelloWorld.cpp
 
 #include "llvm/IR/PassManager.h"
