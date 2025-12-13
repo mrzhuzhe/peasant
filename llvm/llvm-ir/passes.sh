@@ -86,7 +86,6 @@ infer-alignment,\
 loop-load-elim,\
 instcombine<max-iterations=1;no-verify-fixpoint>,\
 simplifycfg<bonus-inst-threshold=1;forward-switch-cond;switch-range-to-icmp;switch-to-lookup;no-keep-loops;hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,\
-slp-vectorizer,\
 vector-combine,\
 instcombine<max-iterations=1;no-verify-fixpoint>,\
 transform-warning,\
