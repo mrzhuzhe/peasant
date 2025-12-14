@@ -9413,7 +9413,7 @@ static bool isOutsideLoopWorkProfitable(GeneratedRTChecks &Checks,
   return true;
 }
 
-LoopVectorizePass::LoopVectorizePass(LoopVectorizeOptions Opts)
+zzLoopVectorizePass::zzLoopVectorizePass(LoopVectorizeOptions Opts)
     : InterleaveOnlyWhenForced(Opts.InterleaveOnlyWhenForced ||
                                !EnableLoopInterleaving),
       VectorizeOnlyWhenForced(Opts.VectorizeOnlyWhenForced ||
@@ -9837,7 +9837,7 @@ static void connectEpilogueVectorLoop(
                                   LVL, ExpandedSCEVs, EPI.VectorTripCount);
 }
 
-bool LoopVectorizePass::processLoop(Loop *L) {
+bool zzLoopVectorizePass::processLoop(Loop *L) {
   assert((EnableVPlanNativePath || L->isInnermost()) &&
          "VPlan-native path is not enabled. Only process inner loops.");
 
@@ -10241,7 +10241,7 @@ bool LoopVectorizePass::processLoop(Loop *L) {
   return true;
 }
 
-LoopVectorizeResult LoopVectorizePass::runImpl(Function &F) {
+LoopVectorizeResult zzLoopVectorizePass::runImpl(Function &F) {
 
   // Don't attempt if
   // 1. the target claims to have no vector registers, and
@@ -10299,7 +10299,7 @@ LoopVectorizeResult LoopVectorizePass::runImpl(Function &F) {
   return LoopVectorizeResult(Changed, CFGChanged);
 }
 
-PreservedAnalyses LoopVectorizePass::run(Function &F,
+PreservedAnalyses zzLoopVectorizePass::run(Function &F,
                                          FunctionAnalysisManager &AM) {
   LI = &AM.getResult<LoopAnalysis>(F);
   // There are no loops in the function. Return before computing other
@@ -10349,9 +10349,9 @@ PreservedAnalyses LoopVectorizePass::run(Function &F,
   return PA;
 }
 
-void LoopVectorizePass::printPipeline(
+void zzLoopVectorizePass::printPipeline(
     raw_ostream &OS, function_ref<StringRef(StringRef)> MapClassName2PassName) {
-  static_cast<PassInfoMixin<LoopVectorizePass> *>(this)->printPipeline(
+  static_cast<PassInfoMixin<zzLoopVectorizePass> *>(this)->printPipeline(
       OS, MapClassName2PassName);
 
   OS << '<';

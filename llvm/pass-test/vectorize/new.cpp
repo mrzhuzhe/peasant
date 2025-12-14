@@ -22,8 +22,8 @@ llvm::PassPluginLibraryInfo getHelloworldPluginInfo() {
             PB.registerPipelineParsingCallback(
                 [](llvm::StringRef Name, llvm::FunctionPassManager &PM,
                    llvm::ArrayRef<llvm::PassBuilder::PipelineElement>) {
-                  if (Name == "zzVectorize") {
-                    PM.addPass(llvm::LoopVectorizePass());
+                  if (Name == "zztest") {
+                    PM.addPass(llvm::zzLoopVectorizePass());
                     return true;
                   }
                   return false;

@@ -1,4 +1,4 @@
-opt -passes="inferattrs,\
+gdb --args opt -load-pass-plugin=build/libnew.so -passes="inferattrs,\
 cgscc(devirt<4>(inline,\
 function-attrs<skip-non-recursive-function-attrs>,\
 function<eager-inv;no-rerun>(sroa<modify-cfg>,\
@@ -27,7 +27,7 @@ lower-constant-intrinsics,\
 loop(loop-rotate<header-duplication;no-prepare-for-lto>),\
 loop-distribute,\
 inject-tli-mappings,\
-zzVectorize,\
+zztest,\
 infer-alignment,\
 instcombine<max-iterations=1;no-verify-fixpoint>,\
 simplifycfg<bonus-inst-threshold=1;forward-switch-cond;switch-range-to-icmp;switch-to-lookup;no-keep-loops;hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,\
@@ -35,4 +35,8 @@ transform-warning,\
 sroa<preserve-cfg>,\
 infer-alignment,\
 instcombine<max-iterations=1;no-verify-fixpoint>,\
-tailcallelim)" -load-pass-plugin=build/libnew.so outputs/simd.ll  -S > outputs/simd-opt.ll
+tailcallelim)" outputs/simd.ll -S > outputs/simd-opt.ll
+
+# b zzLoopVectorizePass::run
+# b llvm::initializeVectorization 
+# b LoopVectorize.cpp:10304

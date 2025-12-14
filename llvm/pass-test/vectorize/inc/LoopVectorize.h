@@ -128,7 +128,7 @@ struct LoopVectorizeResult {
 };
 
 /// The LoopVectorize Pass.
-struct LoopVectorizePass : public PassInfoMixin<LoopVectorizePass> {
+struct zzLoopVectorizePass : public PassInfoMixin<zzLoopVectorizePass> {
 private:
   /// If false, consider all loops for interleaving.
   /// If true, only loops that explicitly request interleaving are considered.
@@ -139,7 +139,7 @@ private:
   bool VectorizeOnlyWhenForced;
 
 public:
-  LLVM_ABI LoopVectorizePass(LoopVectorizeOptions Opts = {});
+  LLVM_ABI zzLoopVectorizePass(LoopVectorizeOptions Opts = {});
 
   ScalarEvolution *SE;
   LoopInfo *LI;
