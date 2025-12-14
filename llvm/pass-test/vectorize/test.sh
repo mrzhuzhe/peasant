@@ -1,4 +1,4 @@
-gdb --ex "b zzLoopVectorizePass::run" --args opt -load-pass-plugin=build/libnew.so -passes="inferattrs,\
+gdb --ex "b zzLoopVectorizePass::run" --args opt --debugify -load-pass-plugin=build/libnew.so -passes="inferattrs,\
 cgscc(devirt<4>(inline,\
 function-attrs<skip-non-recursive-function-attrs>,\
 function<eager-inv;no-rerun>(sroa<modify-cfg>,\
@@ -39,3 +39,5 @@ tailcallelim)" outputs/simd.ll -S
 
 # b zzLoopVectorizePass::run
 # b LoopVectorize.cpp:10304
+# https://llvm.org/docs/SourceLevelDebugging.html
+# -stats Statistics are disabled.  Build with asserts or with -DLLVM_FORCE_ENABLE_STATS
