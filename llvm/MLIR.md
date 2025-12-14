@@ -10,7 +10,7 @@ https://mlir.llvm.org/docs/Dialects/GPU/
 ## Build
 
 ```
-cmake -DLLVM_ENABLE_PROJECTS="mlir" \
+cmake -DLLVM_ENABLE_PROJECTS="clang;mlir" \
     -DLLVM_BUILD_EXAMPLES=ON \
     -DLLVM_TARGETS_TO_BUILD="X86;NVPTX" \
     -DCMAKE_BUILD_TYPE=Debug \

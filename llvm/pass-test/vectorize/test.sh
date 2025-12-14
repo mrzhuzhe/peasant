@@ -1,4 +1,5 @@
-gdb --ex "b zzLoopVectorizePass::run" --args opt --debugify -load-pass-plugin=build/libnew.so -passes="inferattrs,\
+export bin_path=/mnt/build/llvm-project/build/bin
+gdb --ex "b zzLoopVectorizePass::run" --args ${bin_path}/opt -debug -load-pass-plugin=build/libnew.so -passes="inferattrs,\
 cgscc(devirt<4>(inline,\
 function-attrs<skip-non-recursive-function-attrs>,\
 function<eager-inv;no-rerun>(sroa<modify-cfg>,\

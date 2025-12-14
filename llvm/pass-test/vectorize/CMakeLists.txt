@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 project(SimpleProject)
 
-find_package(LLVM REQUIRED CONFIG)
+find_package(LLVM REQUIRED CONFIG PATHS /mnt/build/llvm-project/build NO_DEFAULT_PATH)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
