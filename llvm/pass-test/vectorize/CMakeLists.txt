@@ -29,7 +29,6 @@ add_library(new SHARED
   LoopVectorizationLegality.cpp
   LoopVectorize.cpp
   new.cpp
-  Vectorize.cpp
   VPlanAnalysis.cpp
   VPlanConstruction.cpp
   VPlan.cpp
