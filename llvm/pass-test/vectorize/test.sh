@@ -1,5 +1,5 @@
 export bin_path=/mnt/build/llvm-project/build/bin
-gdb --ex "b zzLoopVectorizePass::run" --args ${bin_path}/opt -debug -load-pass-plugin=build/libnew.so -passes="inferattrs,\
+gdb --ex "b zzLoopVectorizePass::run" --args ${bin_path}/opt -load-pass-plugin=build/libnew.so -passes="inferattrs,\
 cgscc(devirt<4>(inline,\
 function-attrs<skip-non-recursive-function-attrs>,\
 function<eager-inv;no-rerun>(sroa<modify-cfg>,\
@@ -9,12 +9,7 @@ loop(loop-idiom,\
 indvars),\
 sroa<modify-cfg>,\
 mldst-motion<no-split-footer-bb>,\
-gvn<>,\
-sccp,\
-bdce,\
 correlated-propagation,\
-adce,\
-dse,\
 simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,\
 instcombine<max-iterations=1;no-verify-fixpoint>),\
 function-attrs,\
