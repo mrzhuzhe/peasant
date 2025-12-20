@@ -21,7 +21,6 @@ globaldce,\
 function<eager-inv>(drop-unnecessary-assumes,\
 lower-constant-intrinsics,\
 loop(loop-rotate<header-duplication;no-prepare-for-lto>),\
-loop-distribute,\
 inject-tli-mappings,\
 zztest,\
 infer-alignment,\
@@ -37,3 +36,4 @@ tailcallelim)" outputs/simd.ll -S
 # b LoopVectorize.cpp:10304
 # https://llvm.org/docs/SourceLevelDebugging.html
 # -stats Statistics are disabled.  Build with asserts or with -DLLVM_FORCE_ENABLE_STATS
+# https://llvm.org/docs/VectorizationPlan.html
