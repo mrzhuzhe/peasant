@@ -532,7 +532,7 @@ static void addInitialSkeleton(VPlan &Plan, Type *InductionTy, DebugLoc IVDL,
 }
 
 std::unique_ptr<VPlan>
-VPlanTransforms::buildVPlan0(Loop *TheLoop, LoopInfo &LI, Type *InductionTy,
+zzVPlanTransforms::buildVPlan0(Loop *TheLoop, LoopInfo &LI, Type *InductionTy,
                              DebugLoc IVDL, PredicatedScalarEvolution &PSE) {
   PlainCFGBuilder Builder(TheLoop, &LI);
   std::unique_ptr<VPlan> VPlan0 = Builder.buildPlainCFG();
@@ -540,7 +540,7 @@ VPlanTransforms::buildVPlan0(Loop *TheLoop, LoopInfo &LI, Type *InductionTy,
   return VPlan0;
 }
 
-void VPlanTransforms::handleEarlyExits(VPlan &Plan,
+void zzVPlanTransforms::handleEarlyExits(VPlan &Plan,
                                        bool HasUncountableEarlyExit) {
   auto *MiddleVPBB = cast<VPBasicBlock>(
       Plan.getScalarHeader()->getSinglePredecessor()->getPredecessors()[0]);
@@ -576,7 +576,7 @@ void VPlanTransforms::handleEarlyExits(VPlan &Plan,
          "missed an uncountable exit that must be handled");
 }
 
-void VPlanTransforms::addMiddleCheck(VPlan &Plan,
+void zzVPlanTransforms::addMiddleCheck(VPlan &Plan,
                                      bool RequiresScalarEpilogueCheck,
                                      bool TailFolded) {
   auto *MiddleVPBB = cast<VPBasicBlock>(
@@ -622,7 +622,7 @@ void VPlanTransforms::addMiddleCheck(VPlan &Plan,
   Builder.createNaryOp(VPInstruction::BranchOnCond, {Cmp}, LatchDL);
 }
 
-void VPlanTransforms::createLoopRegions(VPlan &Plan) {
+void zzVPlanTransforms::createLoopRegions(VPlan &Plan) {
   VPDominatorTree VPDT;
   VPDT.recalculate(Plan);
   for (VPBlockBase *HeaderVPB : vp_post_order_shallow(Plan.getEntry()))
@@ -638,7 +638,7 @@ void VPlanTransforms::createLoopRegions(VPlan &Plan) {
 // including memory overlap checks block and wrapping/unit-stride checks block.
 static constexpr uint32_t CheckBypassWeights[] = {1, 127};
 
-void VPlanTransforms::attachCheckBlock(VPlan &Plan, Value *Cond,
+void zzVPlanTransforms::attachCheckBlock(VPlan &Plan, Value *Cond,
                                        BasicBlock *CheckBlock,
                                        bool AddBranchWeights) {
   VPValue *CondVPV = Plan.getOrAddLiveIn(Cond);
@@ -672,7 +672,7 @@ void VPlanTransforms::attachCheckBlock(VPlan &Plan, Value *Cond,
   }
 }
 
-void VPlanTransforms::addMinimumIterationCheck(
+void zzVPlanTransforms::addMinimumIterationCheck(
     VPlan &Plan, ElementCount VF, unsigned UF,
     ElementCount MinProfitableTripCount, bool RequiresScalarEpilogue,
     bool TailFolded, bool CheckNeededWithTailFolding, Loop *OrigLoop,
@@ -756,7 +756,7 @@ void VPlanTransforms::addMinimumIterationCheck(
   }
 }
 
-void VPlanTransforms::addMinimumVectorEpilogueIterationCheck(
+void zzVPlanTransforms::addMinimumVectorEpilogueIterationCheck(
     VPlan &Plan, Value *TripCount, Value *VectorTripCount,
     bool RequiresScalarEpilogue, ElementCount EpilogueVF, unsigned EpilogueUF,
     unsigned MainLoopStep, unsigned EpilogueLoopStep, ScalarEvolution &SE) {
@@ -793,7 +793,7 @@ void VPlanTransforms::addMinimumVectorEpilogueIterationCheck(
   Branch->addMetadata(LLVMContext::MD_prof, BranchWeights);
 }
 
-bool VPlanTransforms::handleMaxMinNumReductions(VPlan &Plan) {
+bool zzVPlanTransforms::handleMaxMinNumReductions(VPlan &Plan) {
   auto GetMinMaxCompareValue = [](VPReductionPHIRecipe *RedPhiR) -> VPValue * {
     auto *MinMaxR = dyn_cast<VPRecipeWithIRFlags>(
         RedPhiR->getBackedgeValue()->getDefiningRecipe());

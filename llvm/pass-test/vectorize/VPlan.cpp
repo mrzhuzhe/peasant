@@ -1573,7 +1573,7 @@ std::string VPSlotTracker::getOrCreateName(const VPValue *V) const {
   return "<badref>";
 }
 
-bool LoopVectorizationPlanner::getDecisionAndClampRange(
+bool zzLoopVectorizationPlanner::getDecisionAndClampRange(
     const std::function<bool(ElementCount)> &Predicate, VFRange &Range) {
   assert(!Range.isEmpty() && "Trying to test an empty VF range.");
   bool PredicateAtRangeStart = Predicate(Range.Start);
@@ -1592,13 +1592,13 @@ bool LoopVectorizationPlanner::getDecisionAndClampRange(
 /// of VF's starting at a given VF and extending it as much as possible. Each
 /// vectorization decision can potentially shorten this sub-range during
 /// buildVPlan().
-void LoopVectorizationPlanner::buildVPlans(ElementCount MinVF,
+void zzLoopVectorizationPlanner::buildVPlans(ElementCount MinVF,
                                            ElementCount MaxVF) {
   auto MaxVFTimes2 = MaxVF * 2;
   for (ElementCount VF = MinVF; ElementCount::isKnownLT(VF, MaxVFTimes2);) {
     VFRange SubRange = {VF, MaxVFTimes2};
     if (auto Plan = tryToBuildVPlan(SubRange)) {
-      VPlanTransforms::optimize(*Plan);
+      zzVPlanTransforms::optimize(*Plan);
       // Update the name of the latch of the top-level vector loop region region
       // after optimizations which includes block folding.
       Plan->getVectorLoopRegion()->getExiting()->setName("vector.latch");
@@ -1608,7 +1608,7 @@ void LoopVectorizationPlanner::buildVPlans(ElementCount MinVF,
   }
 }
 
-VPlan &LoopVectorizationPlanner::getPlanFor(ElementCount VF) const {
+VPlan &zzLoopVectorizationPlanner::getPlanFor(ElementCount VF) const {
   assert(count_if(VPlans,
                   [VF](const VPlanPtr &Plan) { return Plan->hasVF(VF); }) ==
              1 &&
@@ -1659,7 +1659,7 @@ static void addRuntimeUnrollDisableMetaData(Loop *L) {
   }
 }
 
-void LoopVectorizationPlanner::updateLoopMetadataAndProfileInfo(
+void zzLoopVectorizationPlanner::updateLoopMetadataAndProfileInfo(
     Loop *VectorLoop, VPBasicBlock *HeaderVPBB, const VPlan &Plan,
     bool VectorizingEpilogue, MDNode *OrigLoopID,
     std::optional<unsigned> OrigAverageTripCount,
@@ -1737,7 +1737,7 @@ void LoopVectorizationPlanner::updateLoopMetadataAndProfileInfo(
 }
 
 #if !defined(NDEBUG) || defined(LLVM_ENABLE_DUMP)
-void LoopVectorizationPlanner::printPlans(raw_ostream &O) {
+void zzLoopVectorizationPlanner::printPlans(raw_ostream &O) {
   if (VPlans.empty()) {
     O << "LV: No VPlans built.\n";
     return;

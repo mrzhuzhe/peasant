@@ -407,7 +407,7 @@ void UnrollState::unrollBlock(VPBlockBase *VPB) {
   }
 }
 
-void VPlanTransforms::unrollByUF(VPlan &Plan, unsigned UF) {
+void zzVPlanTransforms::unrollByUF(VPlan &Plan, unsigned UF) {
   assert(UF > 0 && "Unroll factor must be positive");
   Plan.setUF(UF);
   auto Cleanup = make_scope_exit([&Plan]() {
@@ -460,7 +460,7 @@ void VPlanTransforms::unrollByUF(VPlan &Plan, unsigned UF) {
     Part++;
   }
 
-  VPlanTransforms::removeDeadRecipes(Plan);
+  zzVPlanTransforms::removeDeadRecipes(Plan);
 }
 
 /// Create a single-scalar clone of \p DefR (must be a VPReplicateRecipe or
@@ -523,7 +523,7 @@ cloneForLane(VPlan &Plan, VPBuilder &Builder, Type *IdxTy,
   return New;
 }
 
-void VPlanTransforms::replicateByVF(VPlan &Plan, ElementCount VF) {
+void zzVPlanTransforms::replicateByVF(VPlan &Plan, ElementCount VF) {
   Type *IdxTy = IntegerType::get(
       Plan.getScalarHeader()->getIRBasicBlock()->getContext(), 32);
 

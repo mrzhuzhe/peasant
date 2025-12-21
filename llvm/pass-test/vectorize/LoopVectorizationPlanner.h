@@ -431,7 +431,7 @@ struct FixedScalableVFPair {
 
 /// Planner drives the vectorization process after having passed
 /// Legality checks.
-class LoopVectorizationPlanner {
+class zzLoopVectorizationPlanner {
   /// The loop that we evaluate.
   Loop *OrigLoop;
 
@@ -487,7 +487,7 @@ class LoopVectorizationPlanner {
                                   VPCostContext &CostCtx) const;
 
 public:
-  LoopVectorizationPlanner(
+  zzLoopVectorizationPlanner(
       Loop *L, LoopInfo *LI, DominatorTree *DT, const TargetLibraryInfo *TLI,
       const TargetTransformInfo &TTI, LoopVectorizationLegality *Legal,
       LoopVectorizationCostModel &CM, InterleavedAccessInfo &IAI,

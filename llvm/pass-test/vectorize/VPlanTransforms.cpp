@@ -44,7 +44,7 @@ cl::opt<bool> EnableWideActiveLaneMask(
     "enable-wide-lane-mask-zz", cl::init(false), cl::Hidden,
     cl::desc("Enable use of wide get active lane mask instructions"));
 
-bool VPlanTransforms::tryToConvertVPInstructionsToVPRecipes(
+bool zzVPlanTransforms::tryToConvertVPInstructionsToVPRecipes(
     VPlanPtr &Plan,
     function_ref<const InductionDescriptor *(PHINode *)>
         GetIntOrFpInductionDescriptor,
@@ -449,7 +449,7 @@ static bool mergeBlocksIntoPredecessors(VPlan &Plan) {
   return !WorkList.empty();
 }
 
-void VPlanTransforms::createAndOptimizeReplicateRegions(VPlan &Plan) {
+void zzVPlanTransforms::createAndOptimizeReplicateRegions(VPlan &Plan) {
   // Convert masked VPReplicateRecipes to if-then region blocks.
   addReplicateRegions(Plan);
 
@@ -550,7 +550,7 @@ static bool isDeadRecipe(VPRecipeBase &R) {
                 [](VPValue *V) { return V->getNumUsers() == 0; });
 }
 
-void VPlanTransforms::removeDeadRecipes(VPlan &Plan) {
+void zzVPlanTransforms::removeDeadRecipes(VPlan &Plan) {
   for (VPBasicBlock *VPBB : VPBlockUtils::blocksOnly<VPBasicBlock>(
            vp_post_order_deep(Plan.getEntry()))) {
     // The recipes in the block are processed in reverse order, to catch chains
@@ -879,7 +879,7 @@ static VPValue *optimizeLatchExitInductionUser(
   return nullptr;
 }
 
-void VPlanTransforms::optimizeInductionExitUsers(
+void zzVPlanTransforms::optimizeInductionExitUsers(
     VPlan &Plan, DenseMap<VPValue *, VPValue *> &EndValues,
     ScalarEvolution &SE) {
   VPBlockBase *MiddleVPBB = Plan.getMiddleBlock();
@@ -1278,7 +1278,7 @@ static void simplifyRecipe(VPRecipeBase &R, VPTypeAnalysis &TypeInfo) {
   }
 }
 
-void VPlanTransforms::simplifyRecipes(VPlan &Plan) {
+void zzVPlanTransforms::simplifyRecipes(VPlan &Plan) {
   ReversePostOrderTraversal<VPBlockDeepTraversalWrapper<VPBlockBase *>> RPOT(
       Plan.getEntry());
   VPTypeAnalysis TypeInfo(Plan);
@@ -1710,7 +1710,7 @@ static bool simplifyBranchConditionForVFAndUF(VPlan &Plan, ElementCount BestVF,
 
     VPBlockUtils::connectBlocks(Preheader, Header);
     VPBlockUtils::connectBlocks(ExitingVPBB, Exit);
-    VPlanTransforms::simplifyRecipes(Plan);
+    zzVPlanTransforms::simplifyRecipes(Plan);
   } else {
     // The vector region contains header phis for which we cannot remove the
     // loop region yet.
@@ -1724,7 +1724,7 @@ static bool simplifyBranchConditionForVFAndUF(VPlan &Plan, ElementCount BestVF,
   return true;
 }
 
-void VPlanTransforms::optimizeForVFAndUF(VPlan &Plan, ElementCount BestVF,
+void zzVPlanTransforms::optimizeForVFAndUF(VPlan &Plan, ElementCount BestVF,
                                          unsigned BestUF,
                                          PredicatedScalarEvolution &PSE) {
   assert(Plan.hasVF(BestVF) && "BestVF is not available in Plan");
@@ -1898,7 +1898,7 @@ static bool hoistPreviousBeforeFORUsers(VPFirstOrderRecurrencePHIRecipe *FOR,
   return true;
 }
 
-bool VPlanTransforms::adjustFixedOrderRecurrences(VPlan &Plan,
+bool zzVPlanTransforms::adjustFixedOrderRecurrences(VPlan &Plan,
                                                   VPBuilder &LoopBuilder) {
   VPDominatorTree VPDT;
   VPDT.recalculate(Plan);
@@ -1946,7 +1946,7 @@ bool VPlanTransforms::adjustFixedOrderRecurrences(VPlan &Plan,
   return true;
 }
 
-void VPlanTransforms::clearReductionWrapFlags(VPlan &Plan) {
+void zzVPlanTransforms::clearReductionWrapFlags(VPlan &Plan) {
   for (VPRecipeBase &R :
        Plan.getVectorLoopRegion()->getEntryBasicBlock()->phis()) {
     auto *PhiR = dyn_cast<VPReductionPHIRecipe>(&R);
@@ -2063,7 +2063,7 @@ struct VPCSEDenseMapInfo : public DenseMapInfo<VPSingleDefRecipe *> {
 
 /// Perform a common-subexpression-elimination of VPSingleDefRecipes on the \p
 /// Plan.
-void VPlanTransforms::cse(VPlan &Plan) {
+void zzVPlanTransforms::cse(VPlan &Plan) {
   VPDominatorTree VPDT(Plan);
   DenseMap<VPSingleDefRecipe *, VPSingleDefRecipe *, VPCSEDenseMapInfo> CSEMap;
 
@@ -2122,7 +2122,7 @@ static void licm(VPlan &Plan) {
   }
 }
 
-void VPlanTransforms::truncateToMinimalBitwidths(
+void zzVPlanTransforms::truncateToMinimalBitwidths(
     VPlan &Plan, const MapVector<Instruction *, uint64_t> &MinBWs) {
   // Keep track of created truncates, so they can be re-used. Note that we
   // cannot use RAUW after creating a new truncate, as this would could make
@@ -2213,7 +2213,7 @@ void VPlanTransforms::truncateToMinimalBitwidths(
   }
 }
 
-void VPlanTransforms::removeBranchOnConst(VPlan &Plan) {
+void zzVPlanTransforms::removeBranchOnConst(VPlan &Plan) {
   for (VPBasicBlock *VPBB : VPBlockUtils::blocksOnly<VPBasicBlock>(
            vp_depth_first_shallow(Plan.getEntry()))) {
     VPValue *Cond;
@@ -2247,7 +2247,7 @@ void VPlanTransforms::removeBranchOnConst(VPlan &Plan) {
   }
 }
 
-void VPlanTransforms::optimize(VPlan &Plan) {
+void zzVPlanTransforms::optimize(VPlan &Plan) {
   runPass(removeRedundantCanonicalIVs, Plan);
   runPass(removeRedundantInductionCasts, Plan);
 
@@ -2417,7 +2417,7 @@ static VPSingleDefRecipe *findHeaderMask(VPlan &Plan) {
   return HeaderMask;
 }
 
-void VPlanTransforms::addActiveLaneMask(
+void zzVPlanTransforms::addActiveLaneMask(
     VPlan &Plan, bool UseActiveLaneMaskForControlFlow,
     bool DataAndControlFlowWithoutRuntimeCheck) {
   assert((!DataAndControlFlowWithoutRuntimeCheck ||
@@ -2624,7 +2624,7 @@ static void transformRecipestoEVLRecipes(VPlan &Plan, VPValue &EVL) {
 
   // Try to optimize header mask recipes away to their EVL variants.
   // TODO: Split optimizeMaskToEVL out and move into
-  // VPlanTransforms::optimize. transformRecipestoEVLRecipes should be run in
+  // zzVPlanTransforms::optimize. transformRecipestoEVLRecipes should be run in
   // tryToBuildVPlanWithVPRecipes beforehand.
   for (VPUser *U : collectUsersRecursively(EVLMask)) {
     auto *CurRecipe = cast<VPRecipeBase>(U);
@@ -2702,7 +2702,7 @@ static void transformRecipestoEVLRecipes(VPlan &Plan, VPValue &EVL) {
 /// %NextAVL = sub IVSize nuw %AVL, %OpEVL
 /// ...
 ///
-void VPlanTransforms::addExplicitVectorLength(
+void zzVPlanTransforms::addExplicitVectorLength(
     VPlan &Plan, const std::optional<unsigned> &MaxSafeElements) {
   VPBasicBlock *Header = Plan.getVectorLoopRegion()->getEntryBasicBlock();
 
@@ -2762,7 +2762,7 @@ void VPlanTransforms::addExplicitVectorLength(
   Plan.setUF(1);
 }
 
-void VPlanTransforms::canonicalizeEVLLoops(VPlan &Plan) {
+void zzVPlanTransforms::canonicalizeEVLLoops(VPlan &Plan) {
   // Find EVL loop entries by locating VPEVLBasedIVPHIRecipe.
   // There should be only one EVL PHI in the entire plan.
   VPEVLBasedIVPHIRecipe *EVLPhi = nullptr;
@@ -2843,7 +2843,7 @@ void VPlanTransforms::canonicalizeEVLLoops(VPlan &Plan) {
   LatchExitingBr->eraseFromParent();
 }
 
-void VPlanTransforms::replaceSymbolicStrides(
+void zzVPlanTransforms::replaceSymbolicStrides(
     VPlan &Plan, PredicatedScalarEvolution &PSE,
     const DenseMap<Value *, const SCEV *> &StridesMap) {
   // Replace VPValues for known constant strides guaranteed by predicate scalar
@@ -2883,7 +2883,7 @@ void VPlanTransforms::replaceSymbolicStrides(
   }
 }
 
-void VPlanTransforms::dropPoisonGeneratingRecipes(
+void zzVPlanTransforms::dropPoisonGeneratingRecipes(
     VPlan &Plan,
     const std::function<bool(BasicBlock *)> &BlockNeedsPredication) {
   // Collect recipes in the backward slice of `Root` that may generate a poison
@@ -2980,7 +2980,7 @@ void VPlanTransforms::dropPoisonGeneratingRecipes(
   }
 }
 
-void VPlanTransforms::createInterleaveGroups(
+void zzVPlanTransforms::createInterleaveGroups(
     VPlan &Plan,
     const SmallPtrSetImpl<const InterleaveGroup<Instruction> *>
         &InterleaveGroups,
@@ -3262,7 +3262,7 @@ static void expandVPWidenPointerInduction(VPWidenPointerInductionRecipe *R,
   ScalarPtrPhi->addOperand(InductionGEP);
 }
 
-void VPlanTransforms::dissolveLoopRegions(VPlan &Plan) {
+void zzVPlanTransforms::dissolveLoopRegions(VPlan &Plan) {
   // Replace loop regions with explicity CFG.
   SmallVector<VPRegionBlock *> LoopRegions;
   for (VPRegionBlock *R : VPBlockUtils::blocksOnly<VPRegionBlock>(
@@ -3274,7 +3274,7 @@ void VPlanTransforms::dissolveLoopRegions(VPlan &Plan) {
     R->dissolveToCFGLoop();
 }
 
-void VPlanTransforms::convertToConcreteRecipes(VPlan &Plan) {
+void zzVPlanTransforms::convertToConcreteRecipes(VPlan &Plan) {
   VPTypeAnalysis TypeInfo(Plan);
   SmallVector<VPRecipeBase *> ToRemove;
   for (VPBasicBlock *VPBB : VPBlockUtils::blocksOnly<VPBasicBlock>(
@@ -3354,7 +3354,7 @@ void VPlanTransforms::convertToConcreteRecipes(VPlan &Plan) {
     R->eraseFromParent();
 }
 
-void VPlanTransforms::handleUncountableEarlyExit(VPBasicBlock *EarlyExitingVPBB,
+void zzVPlanTransforms::handleUncountableEarlyExit(VPBasicBlock *EarlyExitingVPBB,
                                                  VPBasicBlock *EarlyExitVPBB,
                                                  VPlan &Plan,
                                                  VPBasicBlock *HeaderVPBB,
@@ -3452,7 +3452,7 @@ tryToMatchAndCreateExtendedReduction(VPReductionRecipe *Red, VPCostContext &Ctx,
   // Clamp the range if using extended-reduction is profitable.
   auto IsExtendedRedValidAndClampRange = [&](unsigned Opcode, bool isZExt,
                                              Type *SrcTy) -> bool {
-    return LoopVectorizationPlanner::getDecisionAndClampRange(
+    return zzLoopVectorizationPlanner::getDecisionAndClampRange(
         [&](ElementCount VF) {
           auto *SrcVecTy = cast<VectorType>(toVectorTy(SrcTy, VF));
           TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
@@ -3501,7 +3501,7 @@ tryToMatchAndCreateMulAccumulateReduction(VPReductionRecipe *Red,
   auto IsMulAccValidAndClampRange =
       [&](bool isZExt, VPWidenRecipe *Mul, VPWidenCastRecipe *Ext0,
           VPWidenCastRecipe *Ext1, VPWidenCastRecipe *OuterExt) -> bool {
-    return LoopVectorizationPlanner::getDecisionAndClampRange(
+    return zzLoopVectorizationPlanner::getDecisionAndClampRange(
         [&](ElementCount VF) {
           TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
           Type *SrcTy =
@@ -3606,7 +3606,7 @@ static void tryToCreateAbstractReductionRecipe(VPReductionRecipe *Red,
   Red->replaceAllUsesWith(AbstractR);
 }
 
-void VPlanTransforms::convertToAbstractRecipes(VPlan &Plan, VPCostContext &Ctx,
+void zzVPlanTransforms::convertToAbstractRecipes(VPlan &Plan, VPCostContext &Ctx,
                                                VFRange &Range) {
   for (VPBasicBlock *VPBB : VPBlockUtils::blocksOnly<VPBasicBlock>(
            vp_depth_first_deep(Plan.getVectorLoopRegion()))) {
@@ -3617,7 +3617,7 @@ void VPlanTransforms::convertToAbstractRecipes(VPlan &Plan, VPCostContext &Ctx,
   }
 }
 
-void VPlanTransforms::materializeBroadcasts(VPlan &Plan) {
+void zzVPlanTransforms::materializeBroadcasts(VPlan &Plan) {
   if (Plan.hasScalarVFOnly())
     return;
 
@@ -3663,7 +3663,7 @@ void VPlanTransforms::materializeBroadcasts(VPlan &Plan) {
   }
 }
 
-void VPlanTransforms::materializeConstantVectorTripCount(
+void zzVPlanTransforms::materializeConstantVectorTripCount(
     VPlan &Plan, ElementCount BestVF, unsigned BestUF,
     PredicatedScalarEvolution &PSE) {
   assert(Plan.hasVF(BestVF) && "BestVF is not available in Plan");
@@ -3693,7 +3693,7 @@ void VPlanTransforms::materializeConstantVectorTripCount(
     Plan.getVectorTripCount().setUnderlyingValue(ConstVecTC->getValue());
 }
 
-void VPlanTransforms::materializeBackedgeTakenCount(VPlan &Plan,
+void zzVPlanTransforms::materializeBackedgeTakenCount(VPlan &Plan,
                                                     VPBasicBlock *VectorPH) {
   VPValue *BTC = Plan.getOrCreateBackedgeTakenCount();
   if (BTC->getNumUsers() == 0)
@@ -3708,7 +3708,7 @@ void VPlanTransforms::materializeBackedgeTakenCount(VPlan &Plan,
   BTC->replaceAllUsesWith(TCMO);
 }
 
-void VPlanTransforms::materializeBuildVectors(VPlan &Plan) {
+void zzVPlanTransforms::materializeBuildVectors(VPlan &Plan) {
   if (Plan.hasScalarVFOnly())
     return;
 
@@ -3759,7 +3759,7 @@ void VPlanTransforms::materializeBuildVectors(VPlan &Plan) {
   }
 }
 
-void VPlanTransforms::materializeVectorTripCount(VPlan &Plan,
+void zzVPlanTransforms::materializeVectorTripCount(VPlan &Plan,
                                                  VPBasicBlock *VectorPHVPBB,
                                                  bool TailByMasking,
                                                  bool RequiresScalarEpilogue) {
@@ -3820,7 +3820,7 @@ void VPlanTransforms::materializeVectorTripCount(VPlan &Plan,
   VectorTC.replaceAllUsesWith(Res);
 }
 
-void VPlanTransforms::materializeVFAndVFxUF(VPlan &Plan, VPBasicBlock *VectorPH,
+void zzVPlanTransforms::materializeVFAndVFxUF(VPlan &Plan, VPBasicBlock *VectorPH,
                                             ElementCount VFEC) {
   VPBuilder Builder(VectorPH, VectorPH->begin());
   Type *TCTy = VPTypeAnalysis(Plan).inferScalarType(Plan.getTripCount());
@@ -3855,7 +3855,7 @@ void VPlanTransforms::materializeVFAndVFxUF(VPlan &Plan, VPBasicBlock *VectorPH,
 }
 
 DenseMap<const SCEV *, Value *>
-VPlanTransforms::expandSCEVs(VPlan &Plan, ScalarEvolution &SE) {
+zzVPlanTransforms::expandSCEVs(VPlan &Plan, ScalarEvolution &SE) {
   const DataLayout &DL = SE.getDataLayout();
   SCEVExpander Expander(SE, DL, "induction", /*PreserveLCSSA=*/true);
 
@@ -3958,7 +3958,7 @@ static bool isAlreadyNarrow(VPValue *VPV) {
   return RepR && RepR->isSingleScalar();
 }
 
-void VPlanTransforms::narrowInterleaveGroups(VPlan &Plan, ElementCount VF,
+void zzVPlanTransforms::narrowInterleaveGroups(VPlan &Plan, ElementCount VF,
                                              unsigned VectorRegWidth) {
   VPRegionBlock *VectorLoop = Plan.getVectorLoopRegion();
   if (!VectorLoop)
@@ -4145,7 +4145,7 @@ void VPlanTransforms::narrowInterleaveGroups(VPlan &Plan, ElementCount VF,
 
 /// Add branch weight metadata, if the \p Plan's middle block is terminated by a
 /// BranchOnCond recipe.
-void VPlanTransforms::addBranchWeightToMiddleTerminator(
+void zzVPlanTransforms::addBranchWeightToMiddleTerminator(
     VPlan &Plan, ElementCount VF, std::optional<unsigned> VScaleForTuning) {
   VPBasicBlock *MiddleVPBB = Plan.getMiddleBlock();
   auto *MiddleTerm =

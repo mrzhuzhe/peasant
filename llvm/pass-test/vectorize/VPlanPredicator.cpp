@@ -261,7 +261,7 @@ void VPPredicator::convertPhisToBlends(VPBasicBlock *VPBB) {
 }
 
 DenseMap<VPBasicBlock *, VPValue *>
-VPlanTransforms::introduceMasksAndLinearize(VPlan &Plan, bool FoldTail) {
+zzVPlanTransforms::introduceMasksAndLinearize(VPlan &Plan, bool FoldTail) {
   VPRegionBlock *LoopRegion = Plan.getVectorLoopRegion();
   // Scan the body of the loop in a topological order to visit each basic block
   // after having visited its predecessor basic blocks.

@@ -33,7 +33,7 @@ struct VFRange;
 
 extern cl::opt<bool> VerifyEachVPlan;
 
-struct VPlanTransforms {
+struct zzVPlanTransforms {
   /// Helper to run a VPlan transform \p Transform on \p VPlan, forwarding extra
   /// arguments to the transform. Returns the boolean returned by the transform.
   template <typename... ArgsTy>
