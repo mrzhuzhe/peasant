@@ -6,9 +6,7 @@ simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;n
 instcombine<max-iterations=1;no-verify-fixpoint>,\
 loop(loop-idiom,\
 indvars)),\
-function-attrs,\
-function(require<should-not-run-function-passes>),\
-coro-annotation-elide)),\
+function-attrs)),\
 globalopt,\
 globaldce,\
 function<eager-inv>(drop-unnecessary-assumes,\
@@ -20,7 +18,6 @@ infer-alignment,\
 instcombine<max-iterations=1;no-verify-fixpoint>,\
 simplifycfg<bonus-inst-threshold=1;forward-switch-cond;switch-range-to-icmp;switch-to-lookup;no-keep-loops;hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,\
 transform-warning,\
-sroa<preserve-cfg>,\
 infer-alignment,\
 instcombine<max-iterations=1;no-verify-fixpoint>,\
 tailcallelim)" outputs/simd.ll -S 
