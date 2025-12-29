@@ -1,0 +1,37 @@
+/*
+  opt outputs/simd.ll -S > outputs/simd-noopt.ll
+  opt -load-pass-plugin=build/libnew.so -passes="zzVectorize" outputs/simd.ll  -S > outputs/simd-opt.ll
+  opt -passes="loop-vectorize" outputs/simd.ll  -S > outputs/simd-opt3.ll
+*/  
+
+//  https://github.com/10x-Engineers/tutorial-llvm-pass/blob/main/HelloWorld/HelloWorld.cpp
+
+#include "llvm/IR/PassManager.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
+#include "inc/LoopVectorize.h"
+
+namespace llvm {
+
+} // namespace llvm
+
+/* New PM Registration */
+llvm::PassPluginLibraryInfo getHelloworldPluginInfo() {
+  return {LLVM_PLUGIN_API_VERSION, "zzVectorize", LLVM_VERSION_STRING,
+          [](llvm::PassBuilder &PB) {
+            PB.registerPipelineParsingCallback(
+                [](llvm::StringRef Name, llvm::FunctionPassManager &PM,
+                   llvm::ArrayRef<llvm::PassBuilder::PipelineElement>) {
+                  if (Name == "zztest") {
+                    PM.addPass(llvm::zzLoopVectorizePass());
+                    return true;
+                  }
+                  return false;
+                });
+          }};
+}
+
+extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo() {
+  return getHelloworldPluginInfo();
+}
