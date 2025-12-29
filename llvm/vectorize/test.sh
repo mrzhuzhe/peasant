@@ -5,14 +5,9 @@ function<eager-inv;no-rerun>(sroa<modify-cfg>,\
 simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;no-hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;no-sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,\
 instcombine<max-iterations=1;no-verify-fixpoint>,\
 loop(loop-idiom,\
-indvars),\
-mldst-motion<no-split-footer-bb>,\
-correlated-propagation,\
-simplifycfg<bonus-inst-threshold=1;no-forward-switch-cond;switch-range-to-icmp;no-switch-to-lookup;keep-loops;hoist-common-insts;no-hoist-loads-stores-with-cond-faulting;sink-common-insts;speculate-blocks;simplify-cond-branch;no-speculate-unpredictables>,\
-instcombine<max-iterations=1;no-verify-fixpoint>),\
+indvars)),\
 function-attrs,\
 function(require<should-not-run-function-passes>),\
-coro-split,\
 coro-annotation-elide)),\
 globalopt,\
 globaldce,\
