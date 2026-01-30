@@ -46,3 +46,4 @@ cmake -DCMAKE_C_COMPILER=$(pwd)/../debug/build/bin/clang \
   build/lib/Target/Cpu0/Cpu0GenInstrInfo.inc 269
   def BEQ     : CBranch16<0x37, "beq", seteq, GPROut>;
 4. LLVm dsp backend
+5. taichi ir taichi codegen
