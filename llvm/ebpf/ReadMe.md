@@ -1,0 +1,1 @@
+1. user space and kernel space https://eunomia.dev/tutorials/11-bootstrap/
