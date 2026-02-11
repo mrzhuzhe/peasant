@@ -2,8 +2,11 @@
 #include "stdio.h"
 #include "kernel_test.h"
 
+// add a runtime function with llvm
+// use a macro or something 
+
 int main(){
-    unsigned n = 100;
+    unsigned n = 1e6;
     size_t size = n * sizeof(float);
     float *a, *b, *c;
     
@@ -15,9 +18,9 @@ int main(){
         a[i] = i;
         b[i] = i;
     }
-
-    testFn(a, b, c, n);
-    
+    for (int i = 0; i < 1e3; i++) {
+       testFn(a, b, c, n);
+    }
 
 
     printf("test %f", c[10]);

@@ -5,7 +5,7 @@
 __global__ void test_kernel(float *a, float *b , float * c, int n){
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i>=n) return;    
-    c[i] = a[i] + b[i];
+    c[i] = a[i] * b[i];
 };
 
 extern void testFn(float *a, float *b , float *c, int n){
