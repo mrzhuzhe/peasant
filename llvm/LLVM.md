@@ -23,7 +23,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
 ## LLVM origin
 
 cmake -DLLVM_ENABLE_PROJECTS="clang" \
-    -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_TARGETS_TO_BUILD="X86;BPF" \
     -DCMAKE_BUILD_TYPE=Release \
     ../llvm \
     --install-prefix $PWD/../install
