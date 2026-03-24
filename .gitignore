@@ -68,3 +68,4 @@ outputs
 sdkconfig
 sdkconfig.*
 llvm/llvm-ir/*.ll
+vmlinux.h
