@@ -1,11 +1,13 @@
-export llvm_path=~/build/llvm-project/llvm
-cmake ${llvm_path} -B build \
+## Separate build mlir and circt
+```
+export llvm_path=~/build/llvm-project
+cmake . -B build \
     -DCMAKE_BUILD_TYPE=Debug \
     -DLLVM_ENABLE_ASSERTIONS=ON \
-    -DLLVM_TARGETS_TO_BUILD=host \
-    -DLLVM_ENABLE_PROJECTS=mlir \
-    -DLLVM_EXTERNAL_PROJECTS=circt \
-    -DLLVM_EXTERNAL_CIRCT_SOURCE_DIR=$PWD
-
+    -DMLIR_DIR=${llvm_path}/build/lib/cmake/mlir \
+    -DLLVM_DIR=${llvm_path}/build/lib/cmake/llvm
+```
 
 // llvm commitid e80604a6418404934a47bb3bfc14b4a21c1de626
+// circt commitid 95242acafbff83dc12aba082b8c29160059148db
+// check circt fail may be in wrong tag
