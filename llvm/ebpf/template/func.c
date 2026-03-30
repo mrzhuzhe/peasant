@@ -6,10 +6,13 @@ static __attribute((noinline)) int get_opcode(struct bpf_raw_tracepoint_args *ct
 }
 
 SEC("raw_tp/")
-int hello(struct bpf_raw_tracepoint_args *ctx) {
+int hello2(struct bpf_raw_tracepoint_args *ctx) {
     int opcode = get_opcode(ctx);
     bpf_printk("Syscall: %d", opcode);
     return 0;
 }
 
 char LICENSE[] SEC("license") = "Dual BSD/GPL";
+
+// bpftool prog dump xlated name hello2
+// need install strace

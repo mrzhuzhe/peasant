@@ -15,10 +15,13 @@ $(TARGETS): %: %.o
 clean: 
 	- rm *.o
 	- rm -f /sys/fs/bpf/hello 
-	- rm -f /sys/fs/bpf/hello-func
+	- rm -f /sys/fs/bpf/func
 
 dump:
 	llvm-objdump -S main.o
 
 load:
 	bpftool prog load main.o /sys/fs/bpf/hello 
+
+load2:
+	bpftool prog load func.o /sys/fs/bpf/func 
