@@ -3,7 +3,6 @@
 // #include "vmlinux.h"
 #include <linux/bpf.h>
 #include <bpf/bpf_helpers.h>
-#include <bpf/bpf_tracing.h>
 
 typedef unsigned int u32;
 typedef int pid_t;
