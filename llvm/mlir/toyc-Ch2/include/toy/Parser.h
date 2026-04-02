@@ -458,10 +458,10 @@ private:
     // 1 is lowest precedence.
     switch (static_cast<char>(lexer.getCurToken())) {
     case '-':
-      return 20;
     case '+':
       return 20;
     case '*':
+    case '/':
       return 40;
     default:
       return -1;
