@@ -15,10 +15,12 @@ set(MLIR_BINARY_DIR ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_MODULE_PATH "${MLIR_CMAKE_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
 
+include(TableGen)
 include(AddLLVM)
 include(AddMLIR)
 
 set(TESTZZ_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+set(TESTZZ_BINARY_DIR ${PROJECT_BINARY_DIR})
 
 include_directories(${LLVM_INCLUDE_DIRS})
 include_directories(${MLIR_INCLUDE_DIRS})
@@ -27,13 +29,26 @@ include_directories(${TESTZZ_SOURCE_DIR}/include)
 link_directories(${LLVM_BUILD_LIBRARY_DIR})
 add_definitions(${LLVM_DEFINITIONS})
 
+add_subdirectory(include/toy)
+
+include_directories(${TESTZZ_BINARY_DIR}/include)
 
 add_llvm_executable(testzz
-  toyc.cpp
-  parser/AST.cpp
+    toyc.cpp
+    parser/AST.cpp
+    mlir/MLIRGen.cpp
+    mlir/Dialect.cpp
+
+    DEPENDS
+    TESTzzOpsIncGen
   )
 
 target_link_libraries(testzz
   PRIVATE
-    MLIRSupport)
+    MLIRAnalysis
+    MLIRFunctionInterfaces
+    MLIRIR
+    MLIRParser
+    MLIRSideEffectInterfaces
+    MLIRTransforms)
 
