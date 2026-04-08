@@ -44,6 +44,9 @@ def ReshapeReshapeOptPattern : Pat<(ReshapeOp(ReshapeOp $arg)),
 // Reshape(Constant(x)) = x'
 def ReshapeConstant :
   NativeCodeCall<"$0.reshape(::llvm::cast<ShapedType>($1.getType()))">;
+//  no use but work
+// def ReshapeConstant :
+// NativeCodeCall<"DenseElementsAttr::get(::llvm::cast<ShapedType>($1.getType()), {11., 22., 33., 44., 55., 66.})">;
 def FoldConstantReshapeOptPattern : Pat<
   (ReshapeOp:$res (ConstantOp $arg)),
   (ConstantOp (ReshapeConstant $arg, $res))>;

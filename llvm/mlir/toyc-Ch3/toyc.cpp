@@ -168,3 +168,6 @@ int main(int argc, char **argv) {
 
   return 0;
 }
+
+// ./build/bin/testzz test/test2.toy --emit mlir --opt > outputs/opt.mlir 2>&1
+// ./build/bin/testzz test/test2.toy --emit mlir > outputs/noopt.mlir 2>&1
