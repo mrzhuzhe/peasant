@@ -38,9 +38,11 @@ add_llvm_executable(testzz
     parser/AST.cpp
     mlir/MLIRGen.cpp
     mlir/Dialect.cpp
+    mlir/ToyCombine.cpp
 
     DEPENDS
     TESTzzOpsIncGen
+    TESTzzCombineIncGen
   )
 
 target_link_libraries(testzz
@@ -49,6 +51,7 @@ target_link_libraries(testzz
     MLIRFunctionInterfaces
     MLIRIR
     MLIRParser
+    MLIRPass
     MLIRSideEffectInterfaces
     MLIRTransforms)
 
