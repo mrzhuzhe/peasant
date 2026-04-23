@@ -1,4 +1,4 @@
 # this is test for reading m3u8 url
 # but youtube and bilibili video cannot find u3m8 url directly
-ffmpeg -i "https://ali-safety-video.acfun.cn/mediacloud/acfun/acfun_video/a0607940d9279b26-cb0fac589b062ca995f356463501cd2c-hls_720p_hevc_60_1.m3u8?pkey=ABD5ysCUtD1L66gnLkzrECF13P3082MLwDZEaTtTHNEQr_3va1Moa2g_fwyqaSDDgNwtGdExPoSuU8ktWQ0x2Xp7BZvoj1RlIFFz9h6IzwI2XxfYT4p8f25a-Svs4shCJHW6E03T-3m-zGOToNUKVomgdM40hwdbvU9yyBjkVat17FOG7A24OAtW_r6jWzpBtfaBBcrlylsd4K6BOYNT295Il31T11LstPXxhwSLn7eyqiayyE0wJaCbjvzN3F24Li8&safety_id=AAKm9HyTLoJNUcWCXAqslGU8" -c copy test.mkv
+ffmpeg -i "https://s5.sanheyiliao.xyz//videos/202604/11/69d934d4ce6d9f98982d4a14/7f3464/index.m3u8" -c copy test.mkv
 ffmpeg -i "outputs/test.mkv" -codec copy "outputs/test.mp4"
