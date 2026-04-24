@@ -42,12 +42,14 @@ add_llvm_executable(testzz
 
     DEPENDS
     TESTzzOpsIncGen
+#    TESTzzShapeInferenceInterfaceIncGen
     TESTzzCombineIncGen
   )
 
 target_link_libraries(testzz
   PRIVATE
     MLIRAnalysis
+    MLIRCastInterfaces
     MLIRFunctionInterfaces
     MLIRIR
     MLIRParser
