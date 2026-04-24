@@ -1,0 +1,1 @@
+gdb --ex "b toyc.cpp:89" --args ./build/bin/testzz test/test3.toy --emit mlir --opt
