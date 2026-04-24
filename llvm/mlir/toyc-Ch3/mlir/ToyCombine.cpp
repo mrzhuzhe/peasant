@@ -66,3 +66,29 @@ void ReshapeOp::getCanonicalizationPatterns(RewritePatternSet &results,
   results.add<ReshapeReshapeOptPattern, RedundantReshapeOptPattern,
               FoldConstantReshapeOptPattern>(context);
 }
+
+
+struct SbTransform : public mlir::OpRewritePattern<SbOp> {
+  SbTransform(mlir::MLIRContext *context)
+      : OpRewritePattern<SbOp>(context, /*benefit=*/1) {}
+
+  llvm::LogicalResult
+  matchAndRewrite(SbOp op,
+                  mlir::PatternRewriter &rewriter) const override {
+
+    // mlir::Value SbOpInput = op.getOperands()[0];
+    // SbOp SbopInputOp = SbOpInput.getDefiningOp<SbOp>();
+    // mlir::OpBuilder builder;
+    Value testOp = MulOp::create(rewriter, op.getLoc(), op.getOperands()[0], op.getOperands()[1]);
+    // if (!SbopInputOp)
+    //   return failure();
+
+    rewriter.replaceOp(op, {testOp});
+    return success();
+  }
+};
+
+void SbOp::getCanonicalizationPatterns(RewritePatternSet &results,
+                                              MLIRContext *context) {
+  results.add<SbTransform>(context);
+}

@@ -360,4 +360,23 @@ def TransposeOp : Toy_Op<"transpose"> {
   let hasVerifier = 1;
 }
 
+def SbOp : Toy_Op<"sbtest"> {
+  let summary = "sb test operation";
+
+  let arguments = (ins F64Tensor:$input1, F64Tensor:$input2);
+  let results = (outs F64Tensor);
+
+  let assemblyFormat = [{
+    `(` $input1 `:` type($input1) `,` $input2 `:` type($input2) `)` attr-dict `to` type(results)
+  }];
+
+  let hasCanonicalizer = 1;
+
+  let builders = [
+    OpBuilder<(ins "Value":$input1, "Value":$input2)>
+  ];
+
+  let hasVerifier = 1;
+}
+
 #endif // TOY_OPS

@@ -335,5 +335,22 @@ llvm::LogicalResult TransposeOp::verify() {
 // TableGen'd op method definitions
 //===----------------------------------------------------------------------===//
 
+
+void SbOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
+                        mlir::Value value1, mlir::Value value2) {
+  state.addTypes(UnrankedTensorType::get(builder.getF64Type()));
+  state.addOperands(value1);
+  state.addOperands(value2);
+}
+
+llvm::LogicalResult SbOp::verify() {
+  auto inputType = llvm::dyn_cast<RankedTensorType>(getOperands()[0].getType());
+  auto resultType = llvm::dyn_cast<RankedTensorType>(getType());
+  if (!inputType || !resultType)
+    return mlir::success();
+  return mlir::success();
+}
+
+
 #define GET_OP_CLASSES
 #include "toy/Ops.cpp.inc"

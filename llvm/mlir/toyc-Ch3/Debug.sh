@@ -1,1 +1,1 @@
-gdb --ex "b toyc.cpp:154" --args ./build/bin/testzz test/test2.toy --emit mlir --opt
+gdb --ex "b toyc.cpp:89" --args ./build/bin/testzz test/test3.toy --emit mlir --opt
