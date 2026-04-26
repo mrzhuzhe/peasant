@@ -20,17 +20,16 @@
 #include "mlir/IR/Operation.h"
 #include "mlir/IR/OperationSupport.h"
 #include "mlir/IR/Value.h"
-// #include "mlir/Interfaces/CallInterfaces.h"
+#include "mlir/Interfaces/CallInterfaces.h"
 #include "mlir/Interfaces/FunctionImplementation.h"
 #include "mlir/Support/LLVM.h"
+#include "mlir/Transforms/InliningUtils.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Casting.h"
 #include <algorithm>
 #include <string>
-
-#include "mlir/Transforms/InliningUtils.h"
 
 using namespace mlir;
 using namespace mlir::toy;
@@ -122,6 +121,10 @@ bool CastOp::areCastCompatible(TypeRange inputs, TypeRange outputs) {
   // The shape is required to match if both types are ranked.
   return !input.hasRank() || !output.hasRank() || input == output;
 }
+
+/// Infer the output shape of the CastOp, this is required by the shape
+/// inference interface.
+void CastOp::inferShapes() { getResult().setType(getInput().getType()); }
 
 //===----------------------------------------------------------------------===//
 // Toy Operations
@@ -262,6 +265,10 @@ mlir::ParseResult AddOp::parse(mlir::OpAsmParser &parser,
 
 void AddOp::print(mlir::OpAsmPrinter &p) { printBinaryOp(p, *this); }
 
+/// Infer the output shape of the AddOp, this is required by the shape inference
+/// interface.
+void AddOp::inferShapes() { getResult().setType(getLhs().getType()); }
+
 //===----------------------------------------------------------------------===//
 // GenericCallOp
 //===----------------------------------------------------------------------===//
@@ -353,6 +360,11 @@ mlir::ParseResult MulOp::parse(mlir::OpAsmParser &parser,
 
 void MulOp::print(mlir::OpAsmPrinter &p) { printBinaryOp(p, *this); }
 
+/// Infer the output shape of the MulOp, this is required by the shape inference
+/// interface.
+void MulOp::inferShapes() { getResult().setType(getLhs().getType()); }
+
+
 //===----------------------------------------------------------------------===//
 // DivOp
 //===----------------------------------------------------------------------===//
@@ -415,6 +427,12 @@ void TransposeOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
                         mlir::Value value) {
   state.addTypes(UnrankedTensorType::get(builder.getF64Type()));
   state.addOperands(value);
+}
+
+void TransposeOp::inferShapes() {
+  auto arrayTy = llvm::cast<RankedTensorType>(getOperand().getType());
+  SmallVector<int64_t, 2> dims(llvm::reverse(arrayTy.getShape()));
+  getResult().setType(RankedTensorType::get(dims, arrayTy.getElementType()));
 }
 
 llvm::LogicalResult TransposeOp::verify() {

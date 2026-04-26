@@ -39,10 +39,11 @@ add_llvm_executable(testzz
     mlir/MLIRGen.cpp
     mlir/Dialect.cpp
     mlir/ToyCombine.cpp
+    mlir/ShapeInferencePass.cpp
 
     DEPENDS
     TESTzzOpsIncGen
-#    TESTzzShapeInferenceInterfaceIncGen
+    TESTzzShapeInferenceInterfaceIncGen
     TESTzzCombineIncGen
   )
 
@@ -50,6 +51,7 @@ target_link_libraries(testzz
   PRIVATE
     MLIRAnalysis
     MLIRCastInterfaces
+    MLIRCallInterfaces
     MLIRFunctionInterfaces
     MLIRIR
     MLIRParser
