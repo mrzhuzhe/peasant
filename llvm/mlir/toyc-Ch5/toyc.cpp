@@ -10,6 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "mlir/Dialect/Func/Extensions/AllExtensions.h"
 #include "mlir/IR/Diagnostics.h"
 #include "toy/AST.h"
 #include "toy/Dialect.h"
@@ -110,7 +111,11 @@ static int loadMLIR(llvm::SourceMgr &sourceMgr, mlir::MLIRContext &context,
 }
 
 static int dumpMLIR() {
-  mlir::MLIRContext context;
+  mlir::DialectRegistry registry;
+  // this is suspectous , maybe can only regist inline dialect and affine dialect 
+  mlir::func::registerAllExtensions(registry);
+
+  mlir::MLIRContext context(registry);
   // Load our Dialect in this MLIR Context.
   context.getOrLoadDialect<mlir::toy::ToyDialect>();
 
@@ -133,6 +138,9 @@ static int dumpMLIR() {
     // Add a run of the canonicalizer to optimize the mlir module.
     pm.addNestedPass<mlir::toy::FuncOp>(mlir::createCanonicalizerPass());
     
+    // Partially lower the toy dialect.
+    pm.addPass(mlir::toy::createLowerToAffinePass());
+
     // pm.addNestedPass<mlir::toy::FuncOp>(mlir::createCSEPass());
     if (mlir::failed(pm.run(*module)))
       return 4;

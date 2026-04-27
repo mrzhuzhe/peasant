@@ -40,6 +40,7 @@ add_llvm_executable(testzz
     mlir/Dialect.cpp
     mlir/ToyCombine.cpp
     mlir/ShapeInferencePass.cpp
+    mlir/LowerToAffineLoops.cpp
 
     DEPENDS
     TESTzzOpsIncGen
@@ -55,8 +56,11 @@ target_link_libraries(testzz
     MLIRFunctionInterfaces
     MLIRIR
     MLIRParser
+    MLIRRegisterAllDialects
+    MLIRRegisterAllExtensions
     MLIRPass
     MLIRSideEffectInterfaces
-    MLIRTransforms)
+    MLIRTransforms
+    )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")

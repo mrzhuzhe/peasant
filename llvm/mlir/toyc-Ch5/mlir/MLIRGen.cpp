@@ -178,7 +178,6 @@ private:
     if (funcAST.getProto()->getName() != "main")
       function.setPrivate();
 
-
     return function;
   }
 
