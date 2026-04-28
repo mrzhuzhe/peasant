@@ -38,6 +38,8 @@
 #include <system_error>
 #include <utility>
 
+#include "mlir/Dialect/LLVMIR/Transforms/InlinerInterfaceImpl.h"
+
 using namespace toy;
 namespace cl = llvm::cl;
 
@@ -114,6 +116,7 @@ static int dumpMLIR() {
   mlir::DialectRegistry registry;
   // this is suspectous , maybe can only regist inline dialect and affine dialect 
   mlir::func::registerAllExtensions(registry);
+  mlir::LLVM::registerInlinerInterface(registry);
 
   mlir::MLIRContext context(registry);
   // Load our Dialect in this MLIR Context.
@@ -140,6 +143,8 @@ static int dumpMLIR() {
     
     // Partially lower the toy dialect.
     pm.addPass(mlir::toy::createLowerToAffinePass());
+
+    pm.addPass(mlir::toy::createLowerToLLVMPass());
 
     // pm.addNestedPass<mlir::toy::FuncOp>(mlir::createCSEPass());
     if (mlir::failed(pm.run(*module)))

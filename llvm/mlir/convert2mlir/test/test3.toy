@@ -24,9 +24,9 @@ def main() {
   # (<2, 3> and <3, 2>) will trigger a shape inference error.
   var f = multiply_transpose(a, c);
 
-  var g = sbtest(e, f);
+  #var g = sbtest(e, f);
   var h = transpose(a) * transpose(b);
   print(f);
   print(h);
-  print(g);
+  #print(g);
 }

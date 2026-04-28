@@ -41,6 +41,7 @@ add_llvm_executable(testzz
     mlir/ToyCombine.cpp
     mlir/ShapeInferencePass.cpp
     mlir/LowerToAffineLoops.cpp
+    mlir/LowerToLLVM.cpp
 
     DEPENDS
     TESTzzOpsIncGen
