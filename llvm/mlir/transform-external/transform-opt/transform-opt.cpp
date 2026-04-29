@@ -48,4 +48,5 @@ int main(int argc, char **argv) {
              : EXIT_FAILURE;
 }
 
-// ./build/bin/testzz ./test/sequence.mlir --pass-pipeline="builtin.module(transform-interpreter{debug-bind-trailing-args=linalg.matmul,linalg.elementwise},canonicalize,cse,symbol-dce)" |
+// ./build/bin/testzz ./test/sequence.mlir --pass-pipeline="builtin.module(transform-interpreter{debug-bind-trailing-args=linalg.matmul,linalg.elementwise},canonicalize,cse,symbol-dce)" 
+//  /home/sanszhu/build/llvm-project/build/bin/transform-opt-ch2 ./test/sequence.mlir --pass-pipeline="builtin.module(transform-interpreter{debug-bind-trailing-args=linalg.matmul,linalg.elementwise},canonicalize,cse,symbol-dce)" > outputs/sequence_origin.mlir
