@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
   mlir::registerSymbolDCEPass();
 
   // Delegate to the MLIR utility for parsing and pass management.
-  return mlir::MlirOptMain(argc, argv, "transform-opt-ch2", registry)
+  return mlir::MlirOptMain(argc, argv, "testzz", registry)
                  .succeeded()
              ? EXIT_SUCCESS
              : EXIT_FAILURE;
