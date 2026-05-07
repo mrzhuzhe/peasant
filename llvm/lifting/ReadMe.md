@@ -12,3 +12,6 @@ https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.h
 page hierarchy
 stack switching
 page mode
+x86 interupt
+
+https://docs.hyperdbg.org/
