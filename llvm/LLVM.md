@@ -1,4 +1,5 @@
 ## LLVM debug for test suite
+```
 cmake -DCMAKE_BUILD_TYPE=Debug \
     -DLLVM_ENABLE_PROJECTS="clang;compiler-rt" \
     -DLLVM_TARGETS_TO_BUILD="X86" \
@@ -6,8 +7,10 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
     -DLLVM_PARALLEL_COMPILE_JOBS=8 \
     -DLLVM_PARALLEL_LINK_JOBS=1 \
     ../llvm
+```
 
 ## LLVM CPU0
+```
 cmake -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_CXX_COMPILER=clang++ \
   -DCMAKE_C_COMPILER=clang \
@@ -18,25 +21,37 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
   -DLLVM_PARALLEL_LINK_JOBS=1 \
   -G "Unix Makefiles" ../llvm \
   time make -j4
-
+```
 
 ## LLVM origin
-
+```
 cmake -DLLVM_ENABLE_PROJECTS="clang" \
     -DLLVM_TARGETS_TO_BUILD="X86;BPF" \
     -DCMAKE_BUILD_TYPE=Release \
     ../llvm \
     --install-prefix $PWD/../install
-
+```
 
 ## LLVM test suite
-
+```
 cmake -DCMAKE_C_COMPILER=$(pwd)/../debug/build/bin/clang \
     -C../llvm-test-suite/cmake/caches/O3.cmake \
     -DCMAKE_C_FLAGS=-fPIE \
     -DCMAKE_CXX_FLAGS=-fPIE \
     ../llvm-test-suite
   make
+```
+
+## Doxygen
+
+```
+source /myvenv/bin/activate
+export PYTHONPATH=/myvenv/lib/python3.14/site-packages/
+
+cmake -DLLVM_ENABLE_SPHINX=true -DSPHINX_OUTPUT_HTML=true ../llvm
+make -j3 docs-llvm-html
+
+```
 
 ## Todos
 

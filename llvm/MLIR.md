@@ -15,6 +15,7 @@ cmake -DLLVM_ENABLE_PROJECTS="mlir" \
     -DLLVM_TARGETS_TO_BUILD="Native;NVPTX;AMDGPU" \
     -DCMAKE_BUILD_TYPE=Debug \
     -DLLVM_ENABLE_ASSERTIONS=ON \
+    -DLLVM_BUILD_DOCS=ON \
     ../llvm \
     --install-prefix $PWD/../install-mlir
 
