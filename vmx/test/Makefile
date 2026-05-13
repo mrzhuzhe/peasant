@@ -29,8 +29,11 @@ guest32.img: guest32.o
 %.img.o: %.img
 	$(LD) -b binary -r $^ -o $@
 
-.PHONY: clean
+.PHONY: clean dump
 clean:
 	$(RM) kvm-test kvm-test.o payload.o guest16.o \
 		guest32.o guest32.img guest32.img.o \
 		guest64.o guest64.img guest64.img.o
+
+dump:
+	objdump -D payload.o > payload_txt.o
