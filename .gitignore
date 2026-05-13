@@ -70,3 +70,4 @@ sdkconfig.*
 llvm/llvm-ir/*.ll
 vmlinux.h
 *.skel.h
+*.img
