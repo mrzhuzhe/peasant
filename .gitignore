@@ -71,3 +71,4 @@ llvm/llvm-ir/*.ll
 vmlinux.h
 *.skel.h
 *.img
+vmx/test/kvm-test
